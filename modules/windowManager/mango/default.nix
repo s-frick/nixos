@@ -404,8 +404,7 @@ in
 
         qt = {
           enable = true;
-          platformTheme = "gtk";
-          style.name = "Adwaita-Dark";
+          platformTheme.name = "Adwaita-Dark";
         };
 
         programs.dankMaterialShell = {

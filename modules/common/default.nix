@@ -8,5 +8,6 @@
     ../windowManager/mango
   ];
 
+
   system.stateVersion = "25.05";
 }

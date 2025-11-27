@@ -1,10 +1,20 @@
-{ ... }:
+{ pkgs, ... }:
 {
   imports = [
+    ../../modules/common
   ];
 
   wsl.enable = true;
-  wsl.defaultUser = "nixos";
+  wsl.defaultUser = "sebi";
   users.users.sebi.isNormalUser = true;
+
+  # wsl-spezifische Systempakete
+  environment.systemPackages = with pkgs; [
+  ];
+
+  # wsl-spezifische Home-Manager-Erweiterungen für sebi
+  home-manager.users.sebi.imports = [
+    ./home.nix
+  ];
 }
 
