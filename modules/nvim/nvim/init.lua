@@ -24,12 +24,23 @@ vim.opt.ttimeout = true
 vim.opt.autoread = true -- Auto reload files changed outside vim
 vim.opt.autowrite = false -- Don't auto save
 
-local keymap = require('keymaps')
+vim.opt.wrap = false
+vim.opt.sidescroll = 1
+vim.opt.sidescrolloff = 5
+vim.opt.linebreak = true   -- wrap nur an Wortgrenzen
+vim.opt.breakindent = true
+
+local keymap = require("keymaps")
 keymap.setup()
+
+local todo_comments = require("todo_comments")
+todo_comments.setup()
+
+-- local mermaid = require('mermaid')
+-- mermaid.setup()
 
 -- Theme
 vim.cmd.colorscheme("catppuccin")
-
 
 -- Treesitter: Parser in ein beschreibbares Verzeichnis legen (nicht im Nix-Store)
 local parser_path = vim.fn.stdpath("data") .. "/treesitter-parsers"
@@ -45,9 +56,9 @@ require("nvim-treesitter.configs").setup({
 	auto_install = false, -- keine Auto-Downloads (würden sonst wieder in den Store wollen)
 	highlight = { enable = true },
 	indent = { enable = true },
-  modules = {},
-  ignore_install = {},
-  sync_install = false
+	modules = {},
+	ignore_install = {},
+	sync_install = false,
 })
 
 -- Lualine
@@ -64,11 +75,11 @@ local luasnip = require("luasnip")
 require("luasnip.loaders.from_vscode").lazy_load()
 
 cmp.setup({
-  preselect = cmp.PreselectMode.Item,
-  completion = {
-    completeopt = "menu,menuone",
-    autocomplete = { require("cmp.types").cmp.TriggerEvent.TextChanged },
-  },
+	preselect = cmp.PreselectMode.Item,
+	completion = {
+		completeopt = "menu,menuone",
+		autocomplete = { require("cmp.types").cmp.TriggerEvent.TextChanged },
+	},
 	snippet = {
 		expand = function(args)
 			luasnip.lsp_expand(args.body)
@@ -77,23 +88,23 @@ cmp.setup({
 	mapping = cmp.mapping.preset.insert({
 		["<C-Space>"] = cmp.mapping.complete(),
 
-    -- Navigation
-    ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
-    ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+		-- Navigation
+		["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+		["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
 
 		["<C-y>"] = cmp.mapping.confirm({ select = false }),
-    ["<CR>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.abort()
-      end
-      fallback()
-    end, { "i", "s" }),
+		["<CR>"] = cmp.mapping(function(fallback)
+			if cmp.visible() then
+				cmp.abort()
+			end
+			fallback()
+		end, { "i", "s" }),
 		["<Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.abort()
-      end
-      fallback()
-    end, { "i", "s" }),
+			if cmp.visible() then
+				cmp.abort()
+			end
+			fallback()
+		end, { "i", "s" }),
 		["<S-Tab>"] = function() end,
 	}),
 	sources = cmp.config.sources({
@@ -134,7 +145,7 @@ vim.diagnostic.config({
 	underline = true,
 })
 -- Zeichen in der Zeichenleiste
-local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+local signs = { Error = "E ", Warn = "⚠", Hint = " ", Info = " " }
 for type, icon in pairs(signs) do
 	local hl = "DiagnosticSign" .. type
 	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
@@ -152,12 +163,12 @@ lspconfig.lua_ls.setup({
 		Lua = {
 			diagnostics = { globals = { "vim" } },
 			workspace = {
-        checkThirdParty = false,
-        library = vim.api.nvim_get_runtime_file("", true),
-      },
-      completion = {
-        callSnippet = "Replace"
-      },
+				checkThirdParty = false,
+				library = vim.api.nvim_get_runtime_file("", true),
+			},
+			completion = {
+				callSnippet = "Replace",
+			},
 			telemetry = { enable = false },
 		},
 	},
@@ -254,74 +265,13 @@ lspconfig.nixd.setup({
 	on_attach = keymap.on_attach,
 })
 
--- ======================================
--- Java LSP (Eclipse JDT LS)
--- ======================================
-local home = os.getenv("HOME")
-local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
-
-local workspace_dir = home .. "/.local/share/eclipse/" .. project_name
-os.execute("mkdir -p " .. workspace_dir)
-
-lspconfig.jdtls.setup({
-	capabilities = capabilities,
-	on_attach = keymap.on_attach,
-	cmd = { "jdtls-lombok" },
-	root_dir = lspconfig.util.root_pattern("pom.xml", "build.gradle", ".git"),
-	settings = {
-		java = {
-			signatureHelp = { enabled = true },
-			contentProvider = { preferred = "fernflower" },
-			completion = {
-				guessMethodArguments = false,
-				favoriteStaticMembers = {
-					"org.junit.Assert.*",
-					"org.junit.Assume.*",
-					"org.junit.jupiter.api.Assertions.*",
-					"org.junit.jupiter.api.Assumptions.*",
-					"org.mockito.Mockito.*",
-				},
-			},
-			sources = {
-				organizeImports = { starThreshold = 9999, staticStarThreshold = 9999 },
-			},
-			configuration = {
-				updateBuildConfiguration = "automatic",
-				runtimes = {
-					{
-						name = "JavaSE-21",
-						path = vim.fn.expand("~/.nix-profile/lib/openjdk"),
-					},
-				},
-			},
-			project = {
-				-- Unterdrückt "Import project?"-Hinweise
-				importHint = false,
-			},
-			import = {
-				-- automatisch Maven/Gradle importieren
-				maven = { enabled = true },
-				gradle = { enabled = true, wrapper = { enabled = true } },
-				-- früheres Setting in VSCode: project.importOnFirstTimeStartup=automatic
-			},
-			eclipse = { downloadSources = true },
-			maven = { downloadSources = true },
-
-			-- Weniger “interaktive” Features = weniger Lärm:
-			implementationsCodeLens = { enabled = true },
-			referencesCodeLens = { enabled = true },
-			references = { includeDecompiledSources = true },
-			format = { enabled = true }, -- falls Formatter-Prompts nerven
-		},
-	},
-	init_options = {
-		workspace = workspace_dir,
-		workspaceFolders = { vim.uri_from_fname(vim.fn.getcwd()) },
-	},
-})
--- vim.keymap.set("n", "<leader>gi", function() vim.lsp.buf.implementation() end, { desc = "Java: Go to implementation" })
--- vim.keymap.set("n", "<leader>gr", function() vim.lsp.buf.references() end, { desc = "Java: Find references" })
--- vim.keymap.set("n", "<leader>go", function() vim.lsp.buf.document_symbol() end, { desc = "Java: Outline" })
+-- TODO: refactor to keymap
+-- DAP / DAP-UI (für jdtls)
+local dap_ok, dap = pcall(require, "dap")
+if dap_ok then
+   vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "DAP: Toggle breakpoint" })
+   vim.keymap.set("n", "<leader>dc", dap.continue,          { desc = "DAP: Continue" })
+end
 
 -- Format on save (Beispiel: Lua via stylua, Shell via shfmt)
 local format_augroup = vim.api.nvim_create_augroup("FormatOnSave", {})

@@ -8,6 +8,7 @@
     tmux
     fd
     ripgrep
+    fzf
 
     ranger
   ];

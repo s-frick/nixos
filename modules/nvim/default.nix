@@ -1,4 +1,19 @@
 { pkgs, lib, config, ... }:
+let
+    neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
+      pname = "neotest-jdtls";
+      version = "dev";
+      src = pkgs.fetchFromGitHub {
+        owner = "s-frick";
+        repo  = "neotest-jdtls";
+        rev   = "c6659f2fadfef7b3547ea023d8c1464bfe5eb168";
+        sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
+        # beim ersten Build wird Nix dir den richtigen Hash sagen;
+        # den dann hier eintragen.
+      };
+      doCheck = false;
+    };
+in
 {
     home.packages = lib.mkAfter (with pkgs; [
       tmux
@@ -27,7 +42,10 @@
       nodePackages_latest.prettier
       prettierd
       eslint_d
+
+      mermaid-cli
     ]);
+
     programs.neovim = {
       enable = true;
       defaultEditor = true;
@@ -38,9 +56,8 @@
       withNodeJs = true;
       withPython3 = true;
   
-      # Tools und LSP-Server, die Neovim nutzen soll (landen im nvim-Wrapper-PATH)
-  
-      plugins = with pkgs.vimPlugins; [
+
+      plugins = (with pkgs.vimPlugins; [
         # LSP & Completion
         nvim-lspconfig
         nvim-cmp
@@ -54,6 +71,10 @@
         mini-icons
         nvim-web-devicons
         vim-tmux-navigator
+        todo-comments-nvim
+        markview-nvim
+        diagram-nvim
+        image-nvim
   
         # Syntax/Parsing
         (nvim-treesitter.withPlugins (p: [
@@ -65,8 +86,15 @@
           p.yaml 
           p.toml 
           p.markdown
+          p.markdown_inline 
+          p.html 
+          p.latex 
+          p.typst 
+          p.yaml
+
           p.typescript 
           p.tsx
+
         ]))
   
         # UI/Navigation
@@ -76,7 +104,8 @@
         gitsigns-nvim
         which-key-nvim
         catppuccin-nvim
-      ];
+      ])
+      ++ [ neotest-jdtls ];
     };
 
     xdg.configFile."nvim".source = ./nvim;
