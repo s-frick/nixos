@@ -58,7 +58,22 @@ in
       eslint_d
 
       mermaid-cli
+
+      vscode-extensions.vscjava.vscode-java-debug
+      vscode-extensions.vscjava.vscode-java-test
     ]);
+
+    home.sessionVariables = {
+      JAVA_HOME = "${pkgs.openjdk21}/lib/openjdk";
+
+      JAVA_DEBUG_SERVER_DIR =
+        "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug/server";
+
+      JAVA_TEST_SERVER_DIR =
+        "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test/server";
+
+      LOMBOK_JAR = "${pkgs.lombok}/share/java/lombok.jar";
+    };
 
     programs.neovim = {
       enable = true;
