@@ -299,3 +299,32 @@ require("femaco").setup({
 vim.keymap.set("n", "<leader>fe", function()
 	require("femaco.edit").edit_code_block()
 end, { desc = "Edit fenced codeblock (LSP)" })
+
+-- Exporte: on_attach & capabilities für Java-FTPlugin
+_G.NVIM_JAVA_LSP = {
+  capabilities = capabilities,
+}
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "java",
+  callback = function()
+    require("jdtls_setup").setup()
+  end,
+})
+
+require("java_neotest").setup()
+
+_G.JAVA_TEST_ON_SAVE = false
+
+vim.api.nvim_create_user_command("JavaTestOnSaveToggle", function()
+  _G.JAVA_TEST_ON_SAVE = not _G.JAVA_TEST_ON_SAVE
+  vim.notify("Java test on save: " .. tostring(_G.JAVA_TEST_ON_SAVE))
+end, {})
+
+vim.api.nvim_create_autocmd("BufWritePost", {
+  pattern = "*.java",
+  callback = function()
+    if not _G.JAVA_TEST_ON_SAVE then return end
+    require("neotest").run.run(vim.loop.cwd())
+  end,
+})

@@ -1,12 +1,26 @@
 { pkgs, lib, config, ... }:
 let
+    # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
+    #   pname = "neotest-jdtls";
+    #   version = "dev";
+    #   src = pkgs.fetchFromGitHub {
+    #     owner = "s-frick";
+    #     repo  = "neotest-jdtls";
+    #     rev   = "c6659f2fadfef7b3547ea023d8c1464bfe5eb168";
+    #     sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
+    #     # beim ersten Build wird Nix dir den richtigen Hash sagen;
+    #     # den dann hier eintragen.
+    #   };
+    #   doCheck = false;
+    # };
+
     neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
       pname = "neotest-jdtls";
-      version = "dev";
+      version = "1.1.1";
       src = pkgs.fetchFromGitHub {
-        owner = "s-frick";
+        owner = "atm1020";
         repo  = "neotest-jdtls";
-        rev   = "c6659f2fadfef7b3547ea023d8c1464bfe5eb168";
+        rev   = "v1.1.1";         # Tag von GitHub
         sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
         # beim ersten Build wird Nix dir den richtigen Hash sagen;
         # den dann hier eintragen.
@@ -59,7 +73,10 @@ in
 
       plugins = (with pkgs.vimPlugins; [
         # LSP & Completion
+        nvim-jdtls
         nvim-lspconfig
+
+        nvim-dap
         nvim-cmp
         cmp-nvim-lsp
         cmp-buffer
@@ -68,14 +85,17 @@ in
         cmp_luasnip
         friendly-snippets
         nvim-FeMaco-lua
-        mini-icons
-        nvim-web-devicons
-        vim-tmux-navigator
         todo-comments-nvim
         markview-nvim
         diagram-nvim
         image-nvim
   
+
+        # Neotest + Dependencies
+        neotest
+        nvim-nio
+        FixCursorHold-nvim
+
         # Syntax/Parsing
         (nvim-treesitter.withPlugins (p: [
           p.java
@@ -97,6 +117,7 @@ in
 
         ]))
   
+
         # UI/Navigation
         telescope-nvim
         plenary-nvim
@@ -104,6 +125,9 @@ in
         gitsigns-nvim
         which-key-nvim
         catppuccin-nvim
+        mini-icons
+        nvim-web-devicons
+        vim-tmux-navigator
       ])
       ++ [ neotest-jdtls ];
     };
