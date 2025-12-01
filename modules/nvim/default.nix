@@ -1,5 +1,11 @@
 { pkgs, lib, config, ... }:
 let
+    neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
+      pname = "neotest-jdtls";
+      version = "dev";
+      src = /home/sebi/git/configs/neotest-jdtls;
+      doCheck = false;
+    };
     # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
     #   pname = "neotest-jdtls";
     #   version = "dev";
@@ -14,19 +20,19 @@ let
     #   doCheck = false;
     # };
 
-    neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
-      pname = "neotest-jdtls";
-      version = "1.1.1";
-      src = pkgs.fetchFromGitHub {
-        owner = "atm1020";
-        repo  = "neotest-jdtls";
-        rev   = "v1.1.1";         # Tag von GitHub
-        sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
-        # beim ersten Build wird Nix dir den richtigen Hash sagen;
-        # den dann hier eintragen.
-      };
-      doCheck = false;
-    };
+    # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
+    #   pname = "neotest-jdtls";
+    #   version = "1.1.1";
+    #   src = pkgs.fetchFromGitHub {
+    #     owner = "atm1020";
+    #     repo  = "neotest-jdtls";
+    #     rev   = "v1.1.1";         # Tag von GitHub
+    #     sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
+    #     # beim ersten Build wird Nix dir den richtigen Hash sagen;
+    #     # den dann hier eintragen.
+    #   };
+    #   doCheck = false;
+    # };
 in
 {
     home.packages = lib.mkAfter (with pkgs; [

@@ -30,6 +30,7 @@
     git
     vim
     htop
+    gnumake
   ];
 
   nix.settings = {
@@ -38,7 +39,9 @@
   };
 
   # User global (gilt für alle Hosts)
+  programs.zsh.enable = true;
   users.users.sebi = {
+    shell = pkgs.zsh;
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" ];
   };

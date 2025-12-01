@@ -10,6 +10,7 @@
 
   # wsl-spezifische Systempakete
   environment.systemPackages = with pkgs; [
+    git-credential-oauth
   ];
 
   # wsl-spezifische Home-Manager-Erweiterungen für sebi

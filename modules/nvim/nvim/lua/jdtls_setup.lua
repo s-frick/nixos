@@ -10,7 +10,11 @@ function M.setup()
 
   -- Root (Maven/Gradle/Git)
   local root_markers = { "pom.xml", "build.gradle", "settings.gradle", ".git" }
-  local root_dir = require("jdtls.setup").find_root(root_markers)
+  local root_dir = require("jdtls.setup").find_root({ ".git" })
+  if vim.fn.filereadable(root_dir .. "/pom.xml") == 0 then
+    -- No parent pom, fallback
+    root_dir = require("jdtls.setup").find_root(root_markers)
+  end
   if not root_dir then
     -- keine echte Java-Root => LSP nicht starten
     return
@@ -99,12 +103,18 @@ function M.setup()
     -- vim.keymap.set("n", "<leader>tA", require("jdtls.jdtls_setup").test_all_test_classes, vim.tbl_extend("force", opts, { desc = "Java: All *Test.java in project" }))
     -- vim.keymap.set("n", "<leader>tp", require("jdtls.jdtls_setup").test_current_package, vim.tbl_extend("force", opts, { desc = "Java: Tests in current package" }))
 
-    local dap_ok = pcall(require, "dap")
+    local dap_ok, dap = pcall(require, "dap")
     if dap_ok then
       jdtls.setup_dap({ hotcodereplace = "auto" })
       if jdtls.setup_dap_main_class_config then
         jdtls.setup_dap_main_class_config()
       end
+      require('dap.ext.vscode').load_launchjs(
+        vim.fn.getcwd() .. '/launch.json',
+        {
+          java = { 'java' },  -- mappe VSCode "type": "java" auf dap.adapters.java
+        }
+      )
     end
 
 
