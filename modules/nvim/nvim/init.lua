@@ -328,3 +328,21 @@ vim.api.nvim_create_autocmd("BufWritePost", {
     require("neotest").run.run(vim.loop.cwd())
   end,
 })
+
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    local arg = vim.fn.argv(0)
+    if arg == "" then
+      return
+    end
+
+    local path = vim.fn.fnamemodify(arg, ":p")
+
+    -- Wenn Datei → parent directory
+    if vim.fn.isdirectory(path) == 0 then
+      path = vim.fn.fnamemodify(path, ":h")
+    end
+
+    vim.cmd("cd " .. vim.fn.fnameescape(path))
+  end,
+})
