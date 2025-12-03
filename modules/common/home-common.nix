@@ -10,6 +10,9 @@
     ripgrep
     fzf
 
+    rbw
+    pinentry-all
+
     lazygit
     ranger
   ];
@@ -41,7 +44,7 @@
 
     oh-my-zsh = {
       enable = true;
-      theme = "lambda";
+      theme = "evan";
 
       plugins = [
         "git"
@@ -151,6 +154,23 @@
       else
           tmux switch-client -t $selected_name
       fi
+    '';
+  };
+  home.file.".local/scripts/rbw-fzf" = {
+    executable = true;
+    text = ''
+      set -eu
+      IFS='
+
+      '
+
+      rbw unlocked >/dev/null 2>&1 || rbw unlock
+
+      item=$(rbw list --fields id,user,name | fzf --height 60% --border --layout=reverse --preview 'rbw get {1} --raw | grep -v password' --preview-window=right,60%:wrap | awk '{print $1}')
+
+      [ "$item" = "" ] && exit 1
+
+      rbw get "$item" --clipboard
     '';
   };
 }
