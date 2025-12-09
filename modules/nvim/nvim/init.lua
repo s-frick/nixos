@@ -27,8 +27,11 @@ vim.opt.autowrite = false -- Don't auto save
 vim.opt.wrap = false
 vim.opt.sidescroll = 1
 vim.opt.sidescrolloff = 5
-vim.opt.linebreak = true   -- wrap nur an Wortgrenzen
+vim.opt.linebreak = true -- wrap nur an Wortgrenzen
 vim.opt.breakindent = true
+
+local autopairs = require("autopairs")
+autopairs.setup()
 
 local keymap = require("keymaps")
 keymap.setup()
@@ -269,8 +272,8 @@ lspconfig.nixd.setup({
 -- DAP / DAP-UI (für jdtls)
 local dap_ok, dap = pcall(require, "dap")
 if dap_ok then
-   vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "DAP: Toggle breakpoint" })
-   vim.keymap.set("n", "<leader>dc", dap.continue,          { desc = "DAP: Continue" })
+	vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "DAP: Toggle breakpoint" })
+	vim.keymap.set("n", "<leader>dc", dap.continue, { desc = "DAP: Continue" })
 end
 
 -- Format on save (Beispiel: Lua via stylua, Shell via shfmt)
@@ -302,14 +305,14 @@ end, { desc = "Edit fenced codeblock (LSP)" })
 
 -- Exporte: on_attach & capabilities für Java-FTPlugin
 _G.NVIM_JAVA_LSP = {
-  capabilities = capabilities,
+	capabilities = capabilities,
 }
 
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "java",
-  callback = function()
-    require("jdtls_setup").setup()
-  end,
+	pattern = "java",
+	callback = function()
+		require("jdtls_setup").setup()
+	end,
 })
 
 require("java_neotest").setup()
@@ -317,32 +320,43 @@ require("java_neotest").setup()
 _G.JAVA_TEST_ON_SAVE = false
 
 vim.api.nvim_create_user_command("JavaTestOnSaveToggle", function()
-  _G.JAVA_TEST_ON_SAVE = not _G.JAVA_TEST_ON_SAVE
-  vim.notify("Java test on save: " .. tostring(_G.JAVA_TEST_ON_SAVE))
+	_G.JAVA_TEST_ON_SAVE = not _G.JAVA_TEST_ON_SAVE
+	vim.notify("Java test on save: " .. tostring(_G.JAVA_TEST_ON_SAVE))
 end, {})
 
 vim.api.nvim_create_autocmd("BufWritePost", {
-  pattern = "*.java",
-  callback = function()
-    if not _G.JAVA_TEST_ON_SAVE then return end
-    require("neotest").run.run(vim.loop.cwd())
-  end,
+	pattern = "*.java",
+	callback = function()
+		if not _G.JAVA_TEST_ON_SAVE then
+			return
+		end
+		require("neotest").run.run(vim.loop.cwd())
+	end,
 })
 
 vim.api.nvim_create_autocmd("VimEnter", {
-  callback = function()
-    local arg = vim.fn.argv(0)
-    if arg == "" then
-      return
-    end
+	callback = function()
+		local arg = vim.fn.argv(0)
+		if arg == "" then
+			return
+		end
 
-    local path = vim.fn.fnamemodify(arg, ":p")
+		local path = vim.fn.fnamemodify(arg, ":p")
 
-    -- Wenn Datei → parent directory
-    if vim.fn.isdirectory(path) == 0 then
-      path = vim.fn.fnamemodify(path, ":h")
-    end
+		-- Wenn Datei → parent directory
+		if vim.fn.isdirectory(path) == 0 then
+			path = vim.fn.fnamemodify(path, ":h")
+		end
 
-    vim.cmd("cd " .. vim.fn.fnameescape(path))
-  end,
+		vim.cmd("cd " .. vim.fn.fnameescape(path))
+	end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "lisp",
+	callback = function()
+		vim.opt_local.makeprg = "sbcl --script %"
+    vim.api.nvim_cmd({ cmd = "EnableAutopairs" }, {})
+		vim.keymap.set("n", "<leader>r", ":make<CR>")
+	end,
 })

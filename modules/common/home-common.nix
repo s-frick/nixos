@@ -1,5 +1,12 @@
 { config, pkgs, ... }:
-
+let
+  input-overlay-presets = pkgs.fetchFromGitHub {
+    owner = "univrsal";
+    repo = "input-overlay";
+    rev = "5.0.6";
+    hash = "sha256-Y3GotIyljrDuEHcr1JTHMNgMPH2QmzWNvb+xTBmYVj8=";
+  };
+in
 {
   imports = [
     ../nvim
@@ -15,7 +22,28 @@
 
     lazygit
     ranger
+    showmethekey
   ];
+
+  programs.obs-studio = {
+    enable = true;
+
+    plugins = with pkgs.obs-studio-plugins; [
+      input-overlay
+      wlrobs                # Wayland Screen Capture (wlroots)
+      obs-pipewire-audio-capture
+    ];
+  };
+
+  home.file.".local/bin/obs-x11" = {
+    executable = true;
+    text = ''
+      #!${pkgs.bash}/bin/bash
+      QT_QPA_PLATFORM=xcb exec obs "$@"
+    '';
+  };
+
+  xdg.configFile."obs-input-overlay/presets".source = "${input-overlay-presets}/presets";
 
   programs.zsh = {
     enable = true;
@@ -40,6 +68,7 @@
       export EDITOR="nvim"
       bindkey -v
       bindkey -s ^f "tmux-sessionizer\n"
+      bindkey -s ^p "rbw-fzf\n"
     '';
 
     oh-my-zsh = {
@@ -121,7 +150,7 @@
     set preview_images_method kitty
   '';
 
-  home.sessionPath = [ "$HOME/.local/scripts" ];
+  home.sessionPath = [ "$HOME/.local/scripts" "$HOME/.local/bin"  ];
   home.file.".local/scripts/tmux-sessionizer" = {
     executable = true;
     text = ''
@@ -130,7 +159,7 @@
       if [[ $# -eq 1 ]]; then
           selected=$1
       else
-          selected=$(find ~/git/old/probes ~/git/old/private ~/git/old/learning ~/git/monkey ~/git/foss ~/git/learning -mindepth 1 -maxdepth 1 -type d | fzf)
+          selected=$(find ~/git/old/probes ~/git/old/private ~/git/old/learning ~/git/monkey ~/git/foss ~/git/learning ~/git/private ~/git -mindepth 1 -maxdepth 1 -type d | fzf)
       fi
 
       if [[ -z $selected ]]; then

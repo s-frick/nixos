@@ -1,6 +1,9 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ../../modules/commonlisp
+  ];
   home.packages = with pkgs; [
     # neovim
   ];

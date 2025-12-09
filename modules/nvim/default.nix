@@ -1,11 +1,11 @@
 { pkgs, lib, config, ... }:
 let
-    neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
-      pname = "neotest-jdtls";
-      version = "dev";
-      src = /home/sebi/git/configs/neotest-jdtls;
-      doCheck = false;
-    };
+    # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
+    #   pname = "neotest-jdtls";
+    #   version = "dev";
+    #   src = /home/sebi/git/configs/neotest-jdtls;
+    #   doCheck = false;
+    # };
     # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
     #   pname = "neotest-jdtls";
     #   version = "dev";
@@ -20,19 +20,30 @@ let
     #   doCheck = false;
     # };
 
-    # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
-    #   pname = "neotest-jdtls";
-    #   version = "1.1.1";
-    #   src = pkgs.fetchFromGitHub {
-    #     owner = "atm1020";
-    #     repo  = "neotest-jdtls";
-    #     rev   = "v1.1.1";         # Tag von GitHub
-    #     sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
-    #     # beim ersten Build wird Nix dir den richtigen Hash sagen;
-    #     # den dann hier eintragen.
-    #   };
-    #   doCheck = false;
-    # };
+    vlime = pkgs.vimUtils.buildVimPlugin {
+      pname = "vlime";
+      version = "main";
+      src = pkgs.fetchFromGitHub {
+        owner = "vlime";
+        repo  = "vlime";
+        rev   = "e276e9a6f37d2699a3caa63be19314f5a19a1481";         # Tag von GitHub
+        sha256 = "sha256-tCqN80lgj11ggzGmuGF077oqL5ByjUp6jVmRUTrIWJA=";
+      };
+      doCheck = false;
+    };
+    neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
+      pname = "neotest-jdtls";
+      version = "1.1.1";
+      src = pkgs.fetchFromGitHub {
+        owner = "atm1020";
+        repo  = "neotest-jdtls";
+        rev   = "v1.1.1";         # Tag von GitHub
+        sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
+        # beim ersten Build wird Nix dir den richtigen Hash sagen;
+        # den dann hier eintragen.
+      };
+      doCheck = false;
+    };
 in
 {
     home.packages = lib.mkAfter (with pkgs; [
@@ -41,10 +52,10 @@ in
       openjdk21
       jdt-language-server
       lombok
-      (writeShellScriptBin "jdtls-lombok" ''
-        exec ${pkgs.jdt-language-server}/bin/jdtls \
-          --jvm-arg=-javaagent:${pkgs.lombok}/share/java/lombok.jar "$@"
-      '')
+      # (writeShellScriptBin "jdtls-lombok" ''
+      #   exec ${pkgs.jdt-language-server}/bin/jdtls \
+      #     --jvm-arg=-javaagent:${pkgs.lombok}/share/java/lombok.jar "$@"
+      # '')
       maven
       lua-language-server
       nixd
@@ -67,6 +78,10 @@ in
 
       vscode-extensions.vscjava.vscode-java-debug
       vscode-extensions.vscjava.vscode-java-test
+
+      # commonlisp
+      sbcl
+      rlwrap
     ]);
 
     home.sessionVariables = {
@@ -133,6 +148,7 @@ in
           p.typst 
           p.yaml
 
+          p.commonlisp
           p.typescript 
           p.tsx
 
@@ -149,8 +165,15 @@ in
         mini-icons
         nvim-web-devicons
         vim-tmux-navigator
+
+        
       ])
-      ++ [ neotest-jdtls ];
+      ++ [ 
+        neotest-jdtls
+
+        # commonlisp
+        vlime
+      ];
     };
 
     xdg.configFile."nvim".source = ./nvim;

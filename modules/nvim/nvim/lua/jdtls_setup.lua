@@ -9,14 +9,19 @@ function M.setup()
   end
 
   -- Root (Maven/Gradle/Git)
-  local root_markers = { "pom.xml", "build.gradle", "settings.gradle", ".git" }
-  local root_dir = require("jdtls.setup").find_root({ ".git" })
-  if vim.fn.filereadable(root_dir .. "/pom.xml") == 0 then
-    -- No parent pom, fallback
-    root_dir = require("jdtls.setup").find_root(root_markers)
+  local root_markers = { "pom.xml", "build.gradle", "settings.gradle" }
+  local root_dir = require("jdtls.setup").find_root({ ".git", ".jdtls-root" })
+  vim.notify('root dir ? ' .. root_dir)
+
+  if root_dir and root_dir ~= "" then
+    if vim.fn.filereadable(root_dir .. "/pom.xml") == 0 then
+      vim.notify('not readable: ' .. root_dir .. "/pom.xml")
+      root_dir = require("jdtls.setup").find_root(root_markers)
+    end
   end
-  if not root_dir then
-    -- keine echte Java-Root => LSP nicht starten
+
+  if not root_dir or root_dir == "" then
+    vim.notify('[ERROR] HILFE!!!! kein root dir')
     return
   end
 
