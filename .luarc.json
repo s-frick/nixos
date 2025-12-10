@@ -1,0 +1,7 @@
+{
+    "diagnostics.globals": [
+        "vim",
+        "toggle_todo",
+        "todo_toggle"
+    ]
+}

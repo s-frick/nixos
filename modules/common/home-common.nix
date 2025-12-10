@@ -16,11 +16,17 @@ in
     fd
     ripgrep
     fzf
+    bat
+    eza
+    tree
 
     rbw
     pinentry-all
 
     lazygit
+    httpyac
+    jq
+    yq
     ranger
     showmethekey
   ];
@@ -69,11 +75,29 @@ in
       bindkey -v
       bindkey -s ^f "tmux-sessionizer\n"
       bindkey -s ^p "rbw-fzf\n"
+      bindkey -s ^e "ranger\n"
+
+      MODE_PROMPT="%F{red}[N]%f"
+
+      function zle-keymap-select {
+        case $KEYMAP in
+          vicmd) MODE_PROMPT="%F{green}[N]%f" ;;   # Normal mode
+          viins|main) MODE_PROMPT="[I]" ;; # Insert mode
+        esac
+        zle reset-prompt
+      }
+      zle -N zle-keymap-select
+
+      function zle-line-init {
+        zle-keymap-select
+      }
+      zle -N zle-line-init
     '';
 
     oh-my-zsh = {
       enable = true;
-      theme = "evan";
+      theme = "evan-vi";
+      custom = "$HOME/.config/oh-my-zsh/custom/";
 
       plugins = [
         "git"
@@ -82,6 +106,12 @@ in
       ];
     };
   };
+
+  xdg.configFile."oh-my-zsh/custom/evan-vi.zsh-theme".text = ''
+    PROMPT='%m :: %1~ %B»%b '
+    RPROMPT='$MODE_PROMPT'
+  '';
+
 
   programs.tmux = {
     enable = true;
@@ -129,7 +159,9 @@ in
       bind G neww -n "git" -S lazygit
       bind N neww -n "notes" -S "nvim ~/git/zettelkasten/log.md"
       bind C neww -n "configs" -S "nvim ~/git/configs/nixos/flake.nix"
+      bind e neww -n "ranger" -S "ranger"
       bind E show-environment -g
+      bind-key S run-shell "tmux-session-switcher"
 
       bind-key -T copy-mode-vi 'v' send -X begin-selection
       bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
@@ -159,7 +191,14 @@ in
       if [[ $# -eq 1 ]]; then
           selected=$1
       else
-          selected=$(find ~/git/old/probes ~/git/old/private ~/git/old/learning ~/git/monkey ~/git/foss ~/git/learning ~/git/private ~/git -mindepth 1 -maxdepth 1 -type d | fzf)
+          selected=$(
+            find ~/git/work ~/git/private ~/git/old/probes \
+                 ~/git/old/private ~/git/old/learning ~/git/monkey \
+                 ~/git/foss ~/git/learning \
+                 -mindepth 1 -maxdepth 1 -type d | 
+            fzf --preview 'eza --tree --level=2 --color=always --git-ignore {}' \
+                --preview-window=right:60%
+            )
       fi
 
       if [[ -z $selected ]]; then
@@ -185,6 +224,22 @@ in
       fi
     '';
   };
+  home.file.".local/scripts/tmux-session-switcher" = {
+    executable = true;
+    text = ''
+        session="$(
+          tmux list-sessions -F "#{session_name}" 2>/dev/null |
+            fzf \
+              --prompt='tmux session > ' \
+              --preview 'tmux list-windows -t {}' \
+              --preview-window=right:60%:border-left
+        )" || exit 1
+
+        [ -z "$session" ] && exit 1
+
+        tmux switch-client -t "$session"
+    '';
+  };
   home.file.".local/scripts/rbw-fzf" = {
     executable = true;
     text = ''
@@ -195,7 +250,7 @@ in
 
       rbw unlocked >/dev/null 2>&1 || rbw unlock
 
-      item=$(rbw list --fields id,user,name | fzf --height 60% --border --layout=reverse --preview 'rbw get {1} --raw | grep -v password' --preview-window=right,60%:wrap | awk '{print $1}')
+      item=$(rbw list --fields name,user,id | fzf --height 60% --border --layout=reverse --preview 'rbw get {3} --raw | grep -v password' --preview-window=right,60%:wrap | awk '{print $3}')
 
       [ "$item" = "" ] && exit 1
 

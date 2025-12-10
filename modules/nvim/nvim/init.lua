@@ -10,6 +10,7 @@ vim.opt.shiftwidth = 2
 vim.opt.tabstop = 2
 vim.opt.smartindent = true
 vim.opt.clipboard = "unnamedplus" -- nutzt unter WSL win32yank
+vim.opt.winborder = 'rounded'
 
 -- File handling
 vim.opt.backup = false -- Don't create backup files
@@ -315,24 +316,29 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
-require("java_neotest").setup()
-
-_G.JAVA_TEST_ON_SAVE = false
-
-vim.api.nvim_create_user_command("JavaTestOnSaveToggle", function()
-	_G.JAVA_TEST_ON_SAVE = not _G.JAVA_TEST_ON_SAVE
-	vim.notify("Java test on save: " .. tostring(_G.JAVA_TEST_ON_SAVE))
-end, {})
-
-vim.api.nvim_create_autocmd("BufWritePost", {
-	pattern = "*.java",
-	callback = function()
-		if not _G.JAVA_TEST_ON_SAVE then
-			return
-		end
-		require("neotest").run.run(vim.loop.cwd())
-	end,
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    require("todo-lists").setup()
+  end,
 })
+
+-- require("java_neotest").setup()
+
+-- _G.JAVA_TEST_ON_SAVE = false
+--
+-- vim.api.nvim_create_user_command("JavaTestOnSaveToggle", function()
+--   _G.JAVA_TEST_ON_SAVE = not _G.JAVA_TEST_ON_SAVE
+--   vim.notify("Java test on save: " .. tostring(_G.JAVA_TEST_ON_SAVE))
+-- end, {})
+--
+-- vim.api.nvim_create_autocmd("BufWritePost", {
+--   pattern = "*.java",
+--   callback = function()
+--     if not _G.JAVA_TEST_ON_SAVE then return end
+--     require("neotest").run.run(vim.loop.cwd())
+--   end,
+-- })
 
 vim.api.nvim_create_autocmd("VimEnter", {
 	callback = function()
