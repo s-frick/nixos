@@ -8,20 +8,25 @@ function M.setup()
     return
   end
 
-  -- Root (Maven/Gradle/Git)
-  local root_markers = { "pom.xml", "build.gradle", "settings.gradle" }
-  local root_dir = require("jdtls.setup").find_root({ ".git", ".jdtls-root" })
-  vim.notify('root dir ? ' .. root_dir)
+  local bufnr = vim.api.nvim_get_current_buf()
+  local fname = vim.api.nvim_buf_get_name(bufnr)
 
+  -- 1) jdt://-URIs ignorieren (dekompilierte Klassen)
+  if fname:match("^jdt://") then
+    return
+  end
+
+  -- Root (Maven/Gradle/Git)
+  local root_markers = { "pom.xml", "build.gradle", "settings.gradle", ".git" }
+  local root_dir = require("jdtls.setup").find_root({ ".git" })
   if root_dir and root_dir ~= "" then
     if vim.fn.filereadable(root_dir .. "/pom.xml") == 0 then
-      vim.notify('not readable: ' .. root_dir .. "/pom.xml")
+      -- No parent pom, fallback
       root_dir = require("jdtls.setup").find_root(root_markers)
     end
   end
 
   if not root_dir or root_dir == "" then
-    vim.notify('[ERROR] HILFE!!!! kein root dir')
     return
   end
 
@@ -70,9 +75,9 @@ function M.setup()
   -- Executable für jdtls herausfinden (jdtls oder jdt-language-server)
   local cmd
   if vim.fn.executable("jdtls") == 1 then
-    cmd = { "jdtls" }
+    cmd = { "jdtls", "-data", workspace_dir }
   elseif vim.fn.executable("jdt-language-server") == 1 then
-    cmd = { "jdt-language-server" }
+    cmd = { "jdt-language-server", "-data", workspace_dir }
   else
     vim.notify("[jdtls] Kein 'jdtls' oder 'jdt-language-server' im PATH gefunden", vim.log.levels.ERROR)
     return
@@ -81,6 +86,7 @@ function M.setup()
   if lombok_jar and lombok_jar ~= "" then
     table.insert(cmd, "--jvm-arg=-javaagent:" .. lombok_jar)
   end
+  table.insert(cmd, "--jvm-arg=-Xmx2g")
 
   local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
@@ -144,24 +150,25 @@ function M.setup()
             "org.mockito.Mockito.*",
           },
         },
+
         sources = {
           organizeImports = { starThreshold = 9999, staticStarThreshold = 9999 },
         },
         configuration = {
-          updateBuildConfiguration = "disabled", -- keine nervigen Popups
+          updateBuildConfiguration = "interactive", -- keine nervigen Popups
         },
         project = {
           importHint = false,
         },
         import = {
-          maven = { enabled = true },
+          maven = { enabled = true, downloadSources = true },
           gradle = { enabled = true, wrapper = { enabled = true } },
         },
         eclipse = { downloadSources = true },
         maven = { downloadSources = true },
         implementationsCodeLens = { enabled = true },
         referencesCodeLens      = { enabled = true },
-        references = { includeDecompiledSources = true },
+        references = { enabled = true, includeDecompiledSources = true },
         format = { enabled = true },
       },
     },

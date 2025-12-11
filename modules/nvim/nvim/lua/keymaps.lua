@@ -73,7 +73,15 @@ local mappings = {
 	},
 
 	-- Lsp
-	{ mode = "n", lhs = "K", rhs = vim.lsp.buf.hover, desc = "Hover docs", scope = "lsp" },
+
+	{ mode = "n", lhs = "K", rhs = function() 
+    vim.lsp.buf.hover{ 
+        border = 'rounded', 
+        max_height = 25, 
+        max_width = 120, 
+        anchor_bias = 'below' 
+      } 
+    end, desc = "Hover docs", scope = "lsp" },
 	{ mode = "n", lhs = "<C-k>", rhs = vim.lsp.buf.signature_help, desc = "Signature help", scope = "lsp" },
 	{ mode = "n", lhs = "gd", rhs = vim.lsp.buf.definition, desc = "Go to definition", scope = "lsp" },
 	{ mode = "n", lhs = "gD", rhs = vim.lsp.buf.declaration, desc = "Go to declaration", scope = "lsp" },

@@ -109,8 +109,17 @@ in
 
       plugins = (with pkgs.vimPlugins; [
         # LSP & Completion
-        nvim-jdtls
+        (pkgs.vimPlugins.nvim-jdtls.overrideAttrs (old: {
+          src = pkgs.fetchFromGitHub {
+            owner = "mfussenegger";
+            repo = "nvim-jdtls";
+            rev = "f73731b543f5971e0da9665eb1d7ceffe1fde71f"; # Beispiel-Commit
+            sha256 = "sha256-9xmrwFXg70xTY+vxOvY2zxphwKzLZ6ncJ3wR544/VJ0="; # müsstest du einmal via nix-prefetch holen
+          };
+        }))
+      #nvim-jdtls
         nvim-lspconfig
+        vim-wakatime
 
         nvim-dap
         nvim-cmp
