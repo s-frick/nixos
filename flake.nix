@@ -2,7 +2,7 @@
   description = "Multi-host NixOS + Home-Manager (one user)";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable = { url = "github:NixOS/nixpkgs/nixos-unstable"; };
 
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
@@ -23,9 +23,9 @@
     };
 
     dankMaterialShell = {
-      url = "github:AvengeMedia/DankMaterialShell";
+      url = "github:AvengeMedia/DankMaterialShell/stable";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
-      inputs.dgop.follows = "dgop";
+      # inputs.dgop.follows = "dgop";
     };
   };
 
