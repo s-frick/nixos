@@ -18,7 +18,7 @@ function M.setup()
 
   -- Root (Maven/Gradle/Git)
   local root_markers = { "pom.xml", "build.gradle", "settings.gradle", ".git" }
-  local root_dir = require("jdtls.setup").find_root({ ".git" })
+  local root_dir = require("jdtls.setup").find_root({ ".git", ".jdtlsroot" })
   if root_dir and root_dir ~= "" then
     if vim.fn.filereadable(root_dir .. "/pom.xml") == 0 then
       -- No parent pom, fallback
@@ -47,7 +47,7 @@ function M.setup()
     end
   end
 
-  local test_dir  = os.getenv("JAVA_TEST_SERVER_DIR")
+  local test_dir = os.getenv("JAVA_TEST_SERVER_DIR")
   if test_dir and test_dir ~= "" then
     local test_jar = vim.split(vim.fn.glob(test_dir .. "/*.jar", 1), "\n")
     local excluded = {
@@ -55,7 +55,7 @@ function M.setup()
       "jacocoagent.jar",
     }
 
-    for _,jar in ipairs(test_jar) do
+    for _, jar in ipairs(test_jar) do
       local fname = vim.fn.fnamemodify(jar, ":t")
       if jar ~= "" and not vim.tbl_contains(excluded, fname) then
         table.insert(bundles, jar)
@@ -123,12 +123,10 @@ function M.setup()
       require('dap.ext.vscode').load_launchjs(
         vim.fn.getcwd() .. '/launch.json',
         {
-          java = { 'java' },  -- mappe VSCode "type": "java" auf dap.adapters.java
+          java = { 'java' }, -- mappe VSCode "type": "java" auf dap.adapters.java
         }
       )
     end
-
-
   end
 
   local config = {
@@ -138,9 +136,9 @@ function M.setup()
 
     settings = {
       java = {
-        signatureHelp = { enabled = true },
-        contentProvider = { preferred = "fernflower" },
-        completion = {
+        signatureHelp           = { enabled = true },
+        contentProvider         = { preferred = "fernflower" },
+        completion              = {
           guessMethodArguments = false,
           favoriteStaticMembers = {
             "org.junit.Assert.*",
@@ -151,25 +149,25 @@ function M.setup()
           },
         },
 
-        sources = {
+        sources                 = {
           organizeImports = { starThreshold = 9999, staticStarThreshold = 9999 },
         },
-        configuration = {
+        configuration           = {
           updateBuildConfiguration = "interactive", -- keine nervigen Popups
         },
-        project = {
+        project                 = {
           importHint = false,
         },
-        import = {
+        import                  = {
           maven = { enabled = true, downloadSources = true },
           gradle = { enabled = true, wrapper = { enabled = true } },
         },
-        eclipse = { downloadSources = true },
-        maven = { downloadSources = true },
+        eclipse                 = { downloadSources = true },
+        maven                   = { downloadSources = true },
         implementationsCodeLens = { enabled = true },
         referencesCodeLens      = { enabled = true },
-        references = { enabled = true, includeDecompiledSources = true },
-        format = { enabled = true },
+        references              = { enabled = true, includeDecompiledSources = true },
+        format                  = { enabled = true },
       },
     },
 
@@ -223,7 +221,7 @@ function M.test_all_test_classes()
   local test_files = find_all_test_files(root_dir)
   vim.notify(vim.inspect(test_files), vim.log.levels.INFO)
 
-  for _,f in ipairs(test_files) do
+  for _, f in ipairs(test_files) do
     print("[jdtls] file found: " .. f)
   end
 
