@@ -40,30 +40,17 @@ function M.setup()
   local bundles = {}
 
   local debug_dir = os.getenv("JAVA_DEBUG_SERVER_DIR")
-  if debug_dir and debug_dir ~= "" then
-    local debug_jar = vim.fn.glob(debug_dir .. "/com.microsoft.java.debug.plugin-*.jar", 1)
-    if debug_jar ~= "" then
-      table.insert(bundles, debug_jar)
-    end
-  end
-
   local test_dir = os.getenv("JAVA_TEST_SERVER_DIR")
-  if test_dir and test_dir ~= "" then
-    local test_jar = vim.split(vim.fn.glob(test_dir .. "/*.jar", 1), "\n")
-    local excluded = {
-      "com.microsoft.java.test.runner-jar-with-dependencies.jar",
-      "jacocoagent.jar",
-    }
 
-    for _, jar in ipairs(test_jar) do
-      local fname = vim.fn.fnamemodify(jar, ":t")
-      if jar ~= "" and not vim.tbl_contains(excluded, fname) then
-        table.insert(bundles, jar)
-      end
-    end
+  -- Debug
+  for _, jar in ipairs(vim.fn.glob(debug_dir .. "/com.microsoft.java.debug.plugin-*.jar", 1, 1)) do
+    table.insert(bundles, jar)
   end
 
-
+  -- Test (nur plugin)
+  for _, jar in ipairs(vim.fn.glob(test_dir .. "/com.microsoft.java.test.plugin-*.jar", 1, 1)) do
+    table.insert(bundles, jar)
+  end
 
   if #bundles == 0 then
     vim.notify("[jdtls] Warnung: keine Debug/Test-Bundles gefunden", vim.log.levels.WARN)
@@ -72,16 +59,22 @@ function M.setup()
   -- Lombok-Agent
   local lombok_jar = os.getenv("LOMBOK_JAR")
 
+  -- FIXME: workaround for incompatible versions jdtls 1.52 and vscode-java-test
+  -- statt "jdtls" / "jdt-language-server" aus PATH:
+  local jdtls_bin =
+  "/nix/store/wkyckfdj74z7gzk43fifla50vcyx3540-jdt-language-server-1.46.1/bin/jdtls" -- pinned due to asm range mismatch with vscode-java-test
+  local cmd = { jdtls_bin, "--data", workspace_dir }
+
   -- Executable für jdtls herausfinden (jdtls oder jdt-language-server)
-  local cmd
-  if vim.fn.executable("jdtls") == 1 then
-    cmd = { "jdtls", "-data", workspace_dir }
-  elseif vim.fn.executable("jdt-language-server") == 1 then
-    cmd = { "jdt-language-server", "-data", workspace_dir }
-  else
-    vim.notify("[jdtls] Kein 'jdtls' oder 'jdt-language-server' im PATH gefunden", vim.log.levels.ERROR)
-    return
-  end
+  -- local cmd
+  -- if vim.fn.executable("jdtls") == 1 then
+  --   cmd = { "jdtls", "--data", workspace_dir }
+  -- elseif vim.fn.executable("jdt-language-server") == 1 then
+  --   cmd = { "jdt-language-server", "-data", workspace_dir }
+  -- else
+  --   vim.notify("[jdtls] Kein 'jdtls' oder 'jdt-language-server' im PATH gefunden", vim.log.levels.ERROR)
+  --   return
+  -- end
 
   if lombok_jar and lombok_jar ~= "" then
     table.insert(cmd, "--jvm-arg=-javaagent:" .. lombok_jar)
@@ -99,6 +92,7 @@ function M.setup()
     vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
     vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
     vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+    vim.keymap.set("n", "<leader>cc", "<cmd>JdtCompile<CR>", opts)
 
     vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
     vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
@@ -108,8 +102,8 @@ function M.setup()
     vim.keymap.set("n", "<leader>de", vim.diagnostic.open_float, opts)
 
     -- Java-spezifische Test-Keymaps (nvim-jdtls)
-    -- vim.keymap.set("n", "<leader>tn", jdtls.test_nearest_method, { buffer = bufnr, desc = "Java: Test nearest" })
-    -- vim.keymap.set("n", "<leader>tN", jdtls.test_class,         { buffer = bufnr, desc = "Java: Test class" })
+    vim.keymap.set("n", "<leader>tn", jdtls.test_nearest_method, { buffer = bufnr, desc = "Java: Test nearest" })
+    vim.keymap.set("n", "<leader>tN", jdtls.test_class, { buffer = bufnr, desc = "Java: Test class" })
     --
     -- vim.keymap.set("n", "<leader>tA", require("jdtls.jdtls_setup").test_all_test_classes, vim.tbl_extend("force", opts, { desc = "Java: All *Test.java in project" }))
     -- vim.keymap.set("n", "<leader>tp", require("jdtls.jdtls_setup").test_current_package, vim.tbl_extend("force", opts, { desc = "Java: Tests in current package" }))
@@ -120,12 +114,9 @@ function M.setup()
       if jdtls.setup_dap_main_class_config then
         jdtls.setup_dap_main_class_config()
       end
-      require('dap.ext.vscode').load_launchjs(
-        vim.fn.getcwd() .. '/launch.json',
-        {
-          java = { 'java' }, -- mappe VSCode "type": "java" auf dap.adapters.java
-        }
-      )
+      require("dap.ext.vscode").load_launchjs(vim.fn.getcwd() .. "/launch.json", {
+        java = { "java" }, -- mappe VSCode "type": "java" auf dap.adapters.java
+      })
     end
   end
 
@@ -136,9 +127,9 @@ function M.setup()
 
     settings = {
       java = {
-        signatureHelp           = { enabled = true },
-        contentProvider         = { preferred = "fernflower" },
-        completion              = {
+        signatureHelp = { enabled = true },
+        contentProvider = { preferred = "fernflower" },
+        completion = {
           guessMethodArguments = false,
           favoriteStaticMembers = {
             "org.junit.Assert.*",
@@ -149,31 +140,31 @@ function M.setup()
           },
         },
 
-        sources                 = {
+        sources = {
           organizeImports = { starThreshold = 9999, staticStarThreshold = 9999 },
         },
-        configuration           = {
+        configuration = {
           updateBuildConfiguration = "interactive", -- keine nervigen Popups
         },
-        project                 = {
+        project = {
           importHint = false,
         },
-        import                  = {
+        import = {
           maven = { enabled = true, downloadSources = true },
           gradle = { enabled = true, wrapper = { enabled = true } },
         },
-        eclipse                 = { downloadSources = true },
-        maven                   = { downloadSources = true },
+        eclipse = { downloadSources = true },
+        maven = { downloadSources = true },
         implementationsCodeLens = { enabled = true },
-        referencesCodeLens      = { enabled = true },
-        references              = { enabled = true, includeDecompiledSources = true },
-        format                  = { enabled = true },
+        referencesCodeLens = { enabled = true },
+        references = { enabled = true, includeDecompiledSources = true },
+        format = { enabled = true },
       },
     },
 
     init_options = {
-      workspace = workspace_dir,
-      bundles   = bundles,
+      -- workspace = workspace_dir,
+      bundles = bundles,
     },
 
     on_attach = on_attach,
@@ -205,7 +196,7 @@ function M.test_all_test_classes()
   local jdtls = require("jdtls")
 
   -- aktiven jdtls-Client holen (wir gehen davon aus: genau einer)
-  local clients = vim.lsp.get_active_clients({ name = "jdtls" })
+  local clients = vim.lsp.get_clients({ name = "jdtls" })
   if #clients == 0 then
     vim.notify("[jdtls] Kein aktiver jdtls-Client gefunden", vim.log.levels.WARN)
     return

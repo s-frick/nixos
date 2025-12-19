@@ -50,25 +50,26 @@ require("lualine").setup({
 })
 
 require("treesitter").setup()
+require("dap_ui_widgets").setup()
 
 -- Gitsigns
 require("gitsigns").setup({})
 require("completion").setup()
 
 -- LSP
-vim.lsp.set_log_level("ERROR")
-vim.lsp.handlers["window/logMessage"] = function() end
-vim.lsp.handlers["$/progress"] = function() end
-vim.lsp.handlers["language/status"] = function() end
+-- vim.lsp.set_log_level("ERROR")
+-- vim.lsp.handlers["window/logMessage"] = function() end
+-- vim.lsp.handlers["$/progress"] = function() end
+-- vim.lsp.handlers["language/status"] = function() end
 
 -- Popups mit Buttons (z.B. "Update project configuration?") automatisch bestätigen:
-vim.lsp.handlers["window/showMessageRequest"] = function(_, result)
-  local actions = result.actions or {}
-  -- wähle die erste Aktion (meist "Always"/"Proceed"/"Yes")
-  if #actions > 0 then
-    return actions[1]
-  end
-end
+-- vim.lsp.handlers["window/showMessageRequest"] = function(_, result)
+--   local actions = result.actions or {}
+--   -- wähle die erste Aktion (meist "Always"/"Proceed"/"Yes")
+--   if #actions > 0 then
+--     return actions[1]
+--   end
+-- end
 
 -- ===== LSP UX: Diagnostics, Signs, Keymaps, on_attach =====
 
@@ -89,7 +90,6 @@ end
 
 local lspconfig = require('lspconfig')
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
-local util = lspconfig.util
 
 require('lsp.lua_ls').setup({
   capabilities = capabilities,
@@ -100,54 +100,12 @@ require('lsp.ts_ls').setup({
   on_attach = keymap.on_attach,
 })
 
--- Autoformat via prettierd oder prettier, falls verfügbar
-local function format_with_prettier(bufnr)
-  local has_prettierd = vim.fn.executable("prettierd") == 1
-  local cmd = has_prettierd and "prettierd" or (vim.fn.executable("prettier") == 1 and "prettier" or nil)
-  if not cmd then
-    return
-  end
-  local ft = vim.bo[bufnr].filetype
-  local exts = {
-    typescript = "ts",
-    typescriptreact = "tsx",
-    javascript = "js",
-    javascriptreact = "jsx",
-    json = "json",
-    css = "css",
-    html = "html",
-    markdown = "md",
-    yaml = "yaml",
-  }
-  local ext = exts[ft]
-  if not ext then
-    return
-  end
-  -- nutze stdin, respektiere Projektconfigs
-  vim.cmd("silent write")
-  vim.fn.jobstart({ cmd, "--stdin-filepath", vim.api.nvim_buf_get_name(bufnr) }, { stdin = "pipe" })
-end
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = { "*.ts", "*.tsx", "*.js", "*.jsx", "*.json", "*.css", "*.html", "*.md", "*.yaml", "*.yml" },
-  callback = function(args)
-    format_with_prettier(args.buf)
-  end,
-})
-
 -- Nix
 lspconfig.nixd.setup({
   capabilities = capabilities,
   on_attach = keymap.on_attach,
 })
 
--- TODO: refactor to keymap
--- DAP / DAP-UI (für jdtls)
-local dap_ok, dap = pcall(require, "dap")
-if dap_ok then
-  vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "DAP: Toggle breakpoint" })
-  vim.keymap.set("n", "<leader>dc", dap.continue, { desc = "DAP: Continue" })
-end
 
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("lsp", { clear = true }),
@@ -166,12 +124,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end
   end
 })
-
-
--- Exporte: on_attach & capabilities für Java-FTPlugin
-_G.NVIM_JAVA_LSP = {
-  capabilities = capabilities,
-}
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "java",

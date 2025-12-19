@@ -1,52 +1,59 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 let
-    # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
-    #   pname = "neotest-jdtls";
-    #   version = "dev";
-    #   src = /home/sebi/git/configs/neotest-jdtls;
-    #   doCheck = false;
-    # };
-    # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
-    #   pname = "neotest-jdtls";
-    #   version = "dev";
-    #   src = pkgs.fetchFromGitHub {
-    #     owner = "s-frick";
-    #     repo  = "neotest-jdtls";
-    #     rev   = "c6659f2fadfef7b3547ea023d8c1464bfe5eb168";
-    #     sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
-    #     # beim ersten Build wird Nix dir den richtigen Hash sagen;
-    #     # den dann hier eintragen.
-    #   };
-    #   doCheck = false;
-    # };
+  # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
+  #   pname = "neotest-jdtls";
+  #   version = "dev";
+  #   src = /home/sebi/git/configs/neotest-jdtls;
+  #   doCheck = false;
+  # };
+  # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
+  #   pname = "neotest-jdtls";
+  #   version = "dev";
+  #   src = pkgs.fetchFromGitHub {
+  #     owner = "s-frick";
+  #     repo  = "neotest-jdtls";
+  #     rev   = "c6659f2fadfef7b3547ea023d8c1464bfe5eb168";
+  #     sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
+  #     # beim ersten Build wird Nix dir den richtigen Hash sagen;
+  #     # den dann hier eintragen.
+  #   };
+  #   doCheck = false;
+  # };
 
-    vlime = pkgs.vimUtils.buildVimPlugin {
-      pname = "vlime";
-      version = "main";
-      src = pkgs.fetchFromGitHub {
-        owner = "vlime";
-        repo  = "vlime";
-        rev   = "e276e9a6f37d2699a3caa63be19314f5a19a1481";         # Tag von GitHub
-        sha256 = "sha256-tCqN80lgj11ggzGmuGF077oqL5ByjUp6jVmRUTrIWJA=";
-      };
-      doCheck = false;
+  vlime = pkgs.vimUtils.buildVimPlugin {
+    pname = "vlime";
+    version = "main";
+    src = pkgs.fetchFromGitHub {
+      owner = "vlime";
+      repo = "vlime";
+      rev = "e276e9a6f37d2699a3caa63be19314f5a19a1481"; # Tag von GitHub
+      sha256 = "sha256-tCqN80lgj11ggzGmuGF077oqL5ByjUp6jVmRUTrIWJA=";
     };
-    neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
-      pname = "neotest-jdtls";
-      version = "1.1.1";
-      src = pkgs.fetchFromGitHub {
-        owner = "atm1020";
-        repo  = "neotest-jdtls";
-        rev   = "v1.1.1";         # Tag von GitHub
-        sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
-        # beim ersten Build wird Nix dir den richtigen Hash sagen;
-        # den dann hier eintragen.
-      };
-      doCheck = false;
+    doCheck = false;
+  };
+  neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
+    pname = "neotest-jdtls";
+    version = "1.1.1";
+    src = pkgs.fetchFromGitHub {
+      owner = "atm1020";
+      repo = "neotest-jdtls";
+      rev = "v1.1.1"; # Tag von GitHub
+      sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
+      # beim ersten Build wird Nix dir den richtigen Hash sagen;
+      # den dann hier eintragen.
     };
+    doCheck = false;
+  };
 in
 {
-    home.packages = lib.mkAfter (with pkgs; [
+  home.packages = lib.mkAfter (
+    with pkgs;
+    [
       tmux
 
       openjdk21
@@ -82,32 +89,31 @@ in
       # commonlisp
       sbcl
       rlwrap
-    ]);
+    ]
+  );
 
-    home.sessionVariables = {
-      JAVA_HOME = "${pkgs.openjdk21}/lib/openjdk";
+  home.sessionVariables = {
+    JAVA_HOME = "${pkgs.openjdk21}/lib/openjdk";
 
-      JAVA_DEBUG_SERVER_DIR =
-        "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug/server";
+    JAVA_DEBUG_SERVER_DIR = "${pkgs.vscode-extensions.vscjava.vscode-java-debug}/share/vscode/extensions/vscjava.vscode-java-debug/server";
 
-      JAVA_TEST_SERVER_DIR =
-        "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test/server";
+    JAVA_TEST_SERVER_DIR = "${pkgs.vscode-extensions.vscjava.vscode-java-test}/share/vscode/extensions/vscjava.vscode-java-test/server";
 
-      LOMBOK_JAR = "${pkgs.lombok}/share/java/lombok.jar";
-    };
+    LOMBOK_JAR = "${pkgs.lombok}/share/java/lombok.jar";
+  };
 
-    programs.neovim = {
-      enable = true;
-      defaultEditor = true;
-      viAlias = false;
-      vimAlias = true;
-  
-      # Falls du Node/Python-Provider für Plugins brauchst (Telescope, Treesitter, etc.)
-      withNodeJs = true;
-      withPython3 = true;
-  
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = false;
+    vimAlias = true;
 
-      plugins = (with pkgs.vimPlugins; [
+    # Falls du Node/Python-Provider für Plugins brauchst (Telescope, Treesitter, etc.)
+    withNodeJs = true;
+    withPython3 = true;
+
+    plugins =
+      (with pkgs.vimPlugins; [
         # LSP & Completion
         (pkgs.vimPlugins.nvim-jdtls.overrideAttrs (old: {
           src = pkgs.fetchFromGitHub {
@@ -117,7 +123,7 @@ in
             sha256 = "sha256-9xmrwFXg70xTY+vxOvY2zxphwKzLZ6ncJ3wR544/VJ0="; # müsstest du einmal via nix-prefetch holen
           };
         }))
-      #nvim-jdtls
+        #nvim-jdtls
         nvim-lspconfig
         vim-wakatime
 
@@ -129,12 +135,13 @@ in
         luasnip
         cmp_luasnip
         friendly-snippets
-        nvim-FeMaco-lua
         todo-comments-nvim
         markview-nvim
         diagram-nvim
         image-nvim
-  
+
+        nvim-dap-view
+        nvim-dap-virtual-text
 
         # Neotest + Dependencies
         neotest
@@ -144,25 +151,24 @@ in
         # Syntax/Parsing
         (nvim-treesitter.withPlugins (p: [
           p.java
-          p.lua 
-          p.nix 
-          p.bash 
-          p.json 
-          p.yaml 
-          p.toml 
+          p.lua
+          p.nix
+          p.bash
+          p.json
+          p.yaml
+          p.toml
           p.markdown
-          p.markdown_inline 
-          p.html 
-          p.latex 
-          p.typst 
+          p.markdown_inline
+          p.html
+          p.latex
+          p.typst
           p.yaml
 
           p.commonlisp
-          p.typescript 
+          p.typescript
           p.tsx
 
         ]))
-  
 
         # UI/Navigation
         telescope-nvim
@@ -175,15 +181,14 @@ in
         nvim-web-devicons
         vim-tmux-navigator
 
-        
       ])
-      ++ [ 
+      ++ [
         neotest-jdtls
 
         # commonlisp
         vlime
       ];
-    };
+  };
 
-    xdg.configFile."nvim".source = ./nvim;
+  xdg.configFile."nvim".source = ./nvim;
 }
