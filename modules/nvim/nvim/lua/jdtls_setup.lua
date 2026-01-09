@@ -2,19 +2,19 @@
 local M = {}
 
 function M.setup()
-  local ok, jdtls = pcall(require, "jdtls")
-  if not ok then
-    vim.notify("[jdtls] Plugin 'nvim-jdtls' nicht gefunden", vim.log.levels.ERROR)
-    return
-  end
+	local ok, jdtls = pcall(require, "jdtls")
+	if not ok then
+		vim.notify("[jdtls] Plugin 'nvim-jdtls' nicht gefunden", vim.log.levels.ERROR)
+		return
+	end
 
-  local bufnr = vim.api.nvim_get_current_buf()
-  local fname = vim.api.nvim_buf_get_name(bufnr)
+	local bufnr = vim.api.nvim_get_current_buf()
+	local fname = vim.api.nvim_buf_get_name(bufnr)
 
-  -- 1) jdt://-URIs ignorieren (dekompilierte Klassen)
-  if fname:match("^jdt://") then
-    return
-  end
+	-- 1) jdt://-URIs ignorieren (dekompilierte Klassen)
+	if fname:match("^jdt://") then
+		return
+	end
 
   -- Root (Maven/Gradle/Git)
   local root_markers = { "pom.xml", "build.gradle", "settings.gradle", ".git" }
@@ -26,18 +26,18 @@ function M.setup()
     end
   end
 
-  if not root_dir or root_dir == "" then
-    return
-  end
+	if not root_dir or root_dir == "" then
+		return
+	end
 
-  -- Workspace pro Projekt
-  local home = os.getenv("HOME")
-  local project_name = vim.fn.fnamemodify(root_dir, ":p:h:t")
-  local workspace_dir = home .. "/.local/share/eclipse/" .. project_name
-  vim.fn.mkdir(workspace_dir, "p")
+	-- Workspace pro Projekt
+	local home = os.getenv("HOME")
+	local project_name = vim.fn.fnamemodify(root_dir, ":p:h:t")
+	local workspace_dir = home .. "/.local/share/eclipse/" .. project_name
+	vim.fn.mkdir(workspace_dir, "p")
 
-  -- Bundles (Debug + Test) aus Env-Vars
-  local bundles = {}
+	-- Bundles (Debug + Test) aus Env-Vars
+	local bundles = {}
 
   local debug_dir = os.getenv("JAVA_DEBUG_SERVER_DIR")
   local test_dir = os.getenv("JAVA_TEST_SERVER_DIR")
@@ -52,12 +52,21 @@ function M.setup()
     table.insert(bundles, jar)
   end
 
-  if #bundles == 0 then
-    vim.notify("[jdtls] Warnung: keine Debug/Test-Bundles gefunden", vim.log.levels.WARN)
-  end
+	-- Executable für jdtls herausfinden (jdtls oder jdt-language-server)
+	local cmd
+	if vim.fn.executable("jdtls") == 1 then
+		cmd = { "jdtls", "-data", workspace_dir }
+	elseif vim.fn.executable("jdt-language-server") == 1 then
+		cmd = { "jdt-language-server", "-data", workspace_dir }
+	else
+		vim.notify("[jdtls] Kein 'jdtls' oder 'jdt-language-server' im PATH gefunden", vim.log.levels.ERROR)
+		return
+	end
 
-  -- Lombok-Agent
-  local lombok_jar = os.getenv("LOMBOK_JAR")
+	if lombok_jar and lombok_jar ~= "" then
+		table.insert(cmd, "--jvm-arg=-javaagent:" .. lombok_jar)
+	end
+	table.insert(cmd, "--jvm-arg=-Xmx2g")
 
   -- FIXME: workaround for incompatible versions jdtls 1.52 and vscode-java-test
   -- statt "jdtls" / "jdt-language-server" aus PATH:
@@ -76,16 +85,20 @@ function M.setup()
   --   return
   -- end
 
-  if lombok_jar and lombok_jar ~= "" then
-    table.insert(cmd, "--jvm-arg=-javaagent:" .. lombok_jar)
-  end
-  table.insert(cmd, "--jvm-arg=-Xmx2g")
+  -- FIXME: keymaps on_attach is not called if jdtls is attached
+	local function on_attach(client, bufnr)
+		-- Standard-LSP-Keymaps
+		local opts = { noremap = true, silent = true, buffer = bufnr }
 
-  local capabilities = require("cmp_nvim_lsp").default_capabilities()
+		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+		vim.keymap.set("n", "gd", require("telescope.builtin").lsp_definitions, opts)
+		vim.keymap.set("n", "gD", require("telescope.builtin").lsp_type_definitions, opts)
+		vim.keymap.set("n", "gi", require("telescope.builtin").lsp_implementations, opts)
+		vim.keymap.set("n", "gr", require("telescope.builtin").lsp_references, opts)
 
-  local function on_attach(client, bufnr)
-    -- Standard-LSP-Keymaps
-    local opts = { noremap = true, silent = true, buffer = bufnr }
+		vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+		vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
+		vim.keymap.set("n", "<leader>cc", "<cmd>JdtCompile<CR>", opts)
 
     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
@@ -94,12 +107,16 @@ function M.setup()
     vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
     vim.keymap.set("n", "<leader>cc", "<cmd>JdtCompile<CR>", opts)
 
-    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-    vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
+		-- Java-spezifische Test-Keymaps (nvim-jdtls)
+		vim.keymap.set("n", "<leader>tn", jdtls.test_nearest_method, { buffer = bufnr, desc = "Java: Test nearest" })
+		vim.keymap.set("n", "<leader>tN", jdtls.test_class,         { buffer = bufnr, desc = "Java: Test class" })
+		--
+		-- vim.keymap.set("n", "<leader>tA", require("jdtls.jdtls_setup").test_all_test_classes, vim.tbl_extend("force", opts, { desc = "Java: All *Test.java in project" }))
+		-- vim.keymap.set("n", "<leader>tp", require("jdtls.jdtls_setup").test_current_package, vim.tbl_extend("force", opts, { desc = "Java: Tests in current package" }))
 
-    vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-    vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-    vim.keymap.set("n", "<leader>de", vim.diagnostic.open_float, opts)
+		local dap_ok, dap = pcall(require, "dap")
+		if dap_ok then
+			jdtls.setup_dap({ hotcodereplace = "auto" })
 
     -- Java-spezifische Test-Keymaps (nvim-jdtls)
     vim.keymap.set("n", "<leader>tn", jdtls.test_nearest_method, { buffer = bufnr, desc = "Java: Test nearest" })
@@ -120,10 +137,10 @@ function M.setup()
     end
   end
 
-  local config = {
-    cmd = cmd,
-    root_dir = root_dir,
-    capabilities = capabilities,
+	local config = {
+		cmd = cmd,
+		root_dir = root_dir,
+		capabilities = capabilities,
 
     settings = {
       java = {
@@ -167,33 +184,30 @@ function M.setup()
       bundles = bundles,
     },
 
-    on_attach = on_attach,
-  }
-
-  jdtls.start_or_attach(config)
+	jdtls.start_or_attach(config)
 end
 
 local function find_all_test_files(root_dir)
-  -- Standard-Maven-Test-Root
-  local test_root = root_dir .. "/src/test/java"
-  if vim.fn.isdirectory(test_root) == 0 then
-    return {}
-  end
+	-- Standard-Maven-Test-Root
+	local test_root = root_dir .. "/src/test/java"
+	if vim.fn.isdirectory(test_root) == 0 then
+		return {}
+	end
 
-  -- rekursiv alle *Test.java finden
-  -- 2. Argument: 1 = "liste", 3. Argument: 1 = "als Lua-Tabelle"
-  local pattern = test_root .. "/**/*Test.java"
-  local files = vim.fn.glob(pattern, 1, 1)
+	-- rekursiv alle *Test.java finden
+	-- 2. Argument: 1 = "liste", 3. Argument: 1 = "als Lua-Tabelle"
+	local pattern = test_root .. "/**/*Test.java"
+	local files = vim.fn.glob(pattern, 1, 1)
 
-  -- optional: Du kannst hier debuggen, was er gefunden hat
-  vim.notify("Gefundene Test-Dateien:\n" .. vim.inspect(files), vim.log.levels.INFO)
+	-- optional: Du kannst hier debuggen, was er gefunden hat
+	vim.notify("Gefundene Test-Dateien:\n" .. vim.inspect(files), vim.log.levels.INFO)
 
-  return files
+	return files
 end
 
 -- alle *Test.java im Projekt finden und jeweils jdtls.test_class() aufrufen
 function M.test_all_test_classes()
-  local jdtls = require("jdtls")
+	local jdtls = require("jdtls")
 
   -- aktiven jdtls-Client holen (wir gehen davon aus: genau einer)
   local clients = vim.lsp.get_clients({ name = "jdtls" })
@@ -202,86 +216,86 @@ function M.test_all_test_classes()
     return
   end
 
-  local root_dir = clients[1].config.root_dir
-  if not root_dir or root_dir == "" then
-    vim.notify("[jdtls] root_dir nicht gesetzt", vim.log.levels.WARN)
-    return
-  end
+	local root_dir = clients[1].config.root_dir
+	if not root_dir or root_dir == "" then
+		vim.notify("[jdtls] root_dir nicht gesetzt", vim.log.levels.WARN)
+		return
+	end
 
-  -- alle *Test.java unterhalb des Projekts suchen
-  local test_files = find_all_test_files(root_dir)
-  vim.notify(vim.inspect(test_files), vim.log.levels.INFO)
+	-- alle *Test.java unterhalb des Projekts suchen
+	local test_files = find_all_test_files(root_dir)
+	vim.notify(vim.inspect(test_files), vim.log.levels.INFO)
 
-  for _, f in ipairs(test_files) do
-    print("[jdtls] file found: " .. f)
-  end
+	for _, f in ipairs(test_files) do
+		print("[jdtls] file found: " .. f)
+	end
 
-  if #test_files == 0 then
-    vim.notify("[jdtls] Keine *Test.java unter src/test/java gefunden", vim.log.levels.INFO)
-    return
-  end
+	if #test_files == 0 then
+		vim.notify("[jdtls] Keine *Test.java unter src/test/java gefunden", vim.log.levels.INFO)
+		return
+	end
 
-  vim.notify("[jdtls] Starte Tests für " .. #test_files .. " Test-Klassen", vim.log.levels.INFO)
+	vim.notify("[jdtls] Starte Tests für " .. #test_files .. " Test-Klassen", vim.log.levels.INFO)
 
-  for _, file in ipairs(test_files) do
-    -- Datei laden (oder in bestehendem Fenster öffnen)
-    vim.notify("[jdtls] Open file: " .. file, vim.log.levels.WARN)
-    vim.cmd("edit " .. vim.fn.fnameescape(file))
-    -- kurze Pause wäre optional, meist geht's ohne
-    jdtls.test_class()
-  end
+	for _, file in ipairs(test_files) do
+		-- Datei laden (oder in bestehendem Fenster öffnen)
+		vim.notify("[jdtls] Open file: " .. file, vim.log.levels.WARN)
+		vim.cmd("edit " .. vim.fn.fnameescape(file))
+		-- kurze Pause wäre optional, meist geht's ohne
+		jdtls.test_class()
+	end
 end
 
 -- alle Tests im "Package" des aktuellen Files
 function M.test_current_package()
-  local jdtls = require("jdtls")
+	local jdtls = require("jdtls")
 
-  local file = vim.api.nvim_buf_get_name(0)
-  if file == "" then
-    vim.notify("[jdtls] Kein aktuelles File", vim.log.levels.WARN)
-    return
-  end
+	local file = vim.api.nvim_buf_get_name(0)
+	if file == "" then
+		vim.notify("[jdtls] Kein aktuelles File", vim.log.levels.WARN)
+		return
+	end
 
-  local dir = vim.fn.fnamemodify(file, ":h")
+	local dir = vim.fn.fnamemodify(file, ":h")
 
-  -- wenn wir unter src/test/java sind, nehmen wir ab da alles
-  local idx = dir:find("/src/test/java/", 1, true)
-  local search_dir = dir
-  if idx then
-    search_dir = dir:sub(1 + idx + #"/src/test/java/")
-    search_dir = vim.fn.fnamemodify(file:sub(1, idx + #"/src/test/java/" - 1) .. search_dir, ":p")
-  end
+	-- wenn wir unter src/test/java sind, nehmen wir ab da alles
+	local idx = dir:find("/src/test/java/", 1, true)
+	local search_dir = dir
+	if idx then
+		search_dir = dir:sub(1 + idx + #"/src/test/java/")
+		search_dir = vim.fn.fnamemodify(file:sub(1, idx + #"/src/test/java/" - 1) .. search_dir, ":p")
+	end
 
-  -- sicherheitshalber: falls das irgendwie schief geht, nimm einfach das aktuelle Verzeichnis
-  if not search_dir or search_dir == "" then
-    search_dir = dir
-  end
+	-- sicherheitshalber: falls das irgendwie schief geht, nimm einfach das aktuelle Verzeichnis
+	if not search_dir or search_dir == "" then
+		search_dir = dir
+	end
 
-  local clients = vim.lsp.get_clients({ name = "jdtls" })
-  if #clients == 0 then
-    vim.notify("[jdtls] Kein aktiver jdtls-Client gefunden", vim.log.levels.WARN)
-    return
-  end
+	local clients = vim.lsp.get_clients({ name = "jdtls" })
+	if #clients == 0 then
+		vim.notify("[jdtls] Kein aktiver jdtls-Client gefunden", vim.log.levels.WARN)
+		return
+	end
 
-  -- Tests unterhalb dieses Verzeichnisses finden
-  local test_files = vim.fs.find(function(name, path)
-    return name:match("Test%.java$") ~= nil
-  end, {
-    path = search_dir,
-    type = "file",
-  })
+	-- Tests unterhalb dieses Verzeichnisses finden
+	local test_files = vim.fs.find(function(name, path)
+		return name:match("Test%.java$") ~= nil
+	end, {
+		path = search_dir,
+		type = "file",
+	})
 
-  if #test_files == 0 then
-    vim.notify("[jdtls] Keine *Test.java im aktuellen Package-Verzeichnis gefunden", vim.log.levels.INFO)
-    return
-  end
+	if #test_files == 0 then
+		vim.notify("[jdtls] Keine *Test.java im aktuellen Package-Verzeichnis gefunden", vim.log.levels.INFO)
+		return
+	end
 
-  vim.notify("[jdtls] Starte Tests für " .. #test_files .. " Test-Klassen im aktuellen Package", vim.log.levels.INFO)
+	vim.notify("[jdtls] Starte Tests für " .. #test_files .. " Test-Klassen im aktuellen Package", vim.log.levels.INFO)
 
-  for _, f in ipairs(test_files) do
-    vim.cmd("edit " .. vim.fn.fnameescape(f))
-    jdtls.test_class()
-  end
+	for _, f in ipairs(test_files) do
+		vim.cmd("edit " .. vim.fn.fnameescape(f))
+		jdtls.test_class()
+	end
 end
 
 return M
