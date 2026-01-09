@@ -1,5 +1,6 @@
 { pkgs, ... }:
 {
+  boot.kernelPackages = pkgs.linuxPackages_latest;
   desktop.mango.enable = true;
 
   # Bootloader.
