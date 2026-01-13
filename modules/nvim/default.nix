@@ -73,6 +73,10 @@ in
       shellcheck
       shfmt
 
+      # Kotlin
+      kotlin-language-server
+      gradle
+
       nodejs
       nodePackages_latest.typescript
       nodePackages_latest.typescript-language-server
@@ -167,6 +171,8 @@ in
           p.commonlisp
           p.typescript
           p.tsx
+
+          p.kotlin
 
         ]))
 

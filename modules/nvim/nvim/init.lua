@@ -99,6 +99,10 @@ require('lsp.ts_ls').setup({
   capabilities = capabilities,
   on_attach = keymap.on_attach,
 })
+require('lsp.kotlin_language_server').setup({
+  capabilities = capabilities,
+  on_attach = keymap.on_attach,
+})
 
 -- Nix
 lspconfig.nixd.setup({
