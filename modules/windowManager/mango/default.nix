@@ -36,6 +36,9 @@ in
       alsa.support32Bit = true;
       pulse.enable = true;
     };
+    environment.sessionVariables = {
+      NIXOS_OZONE_WL = "1";
+    };
 
     xdg.portal = {
       enable = true;
@@ -44,12 +47,11 @@ in
       wlr.enable = true;
       wlr.settings = {
         screencast = {
-          output_name = "HDMI-A-1";
           max_fps = 30;
-          exec_before = "disable_notifications.sh";
-          exec_after = "enable_notifications.sh";
-          chooser_type = "simple";
-          chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
+          # Let xdpw feed valid output names to a dmenu-compatible chooser.
+          # This avoids slurp output/name mismatches ("selected unknown target").
+          chooser_type = "dmenu";
+          chooser_cmd = "${pkgs.wofi}/bin/wofi --dmenu -p 'Share output'";
         };
       };
 
@@ -57,6 +59,11 @@ in
         common = { "org.freedesktop.impl.portal.ScreenCast" = [ "wlr" ]; };
       };
     };
+
+    # Avoid startup races: xdg-desktop-portal-wlr must not be gated by
+    # ConditionEnvironment=WAYLAND_DISPLAY because that variable may arrive
+    # in the user manager slightly later than the service activation.
+    systemd.user.services.xdg-desktop-portal-wlr.unitConfig.ConditionEnvironment = lib.mkForce "";
 
     fonts = {
       enableDefaultPackages = true;
@@ -271,7 +278,7 @@ in
   
                     # menu and terminal
                     bind=SUPER,Return,spawn,kitty
-                    bind=SUPER+SHIFT,f,spawn,brave
+                    bind=SUPER+SHIFT,f,spawn,brave --ozone-platform-hint=auto --enable-features=WebRTCPipeWireCapturer
                     bind=SUPER,d,spawn,dms ipc call spotlight open
                     bind=SUPER+SHIFT,s,spawn,./scripts/take_screenshot
   
@@ -364,8 +371,9 @@ in
                     # Environment variables
                     env=XCURSOR_SIZE,24
                     env=XCURSOR_THEME,Adwaita-dark
-                    env=WAYLAND_DISPLAY,wlroots
+                    env=XDG_SESSION_TYPE,wayland
                     env=XDG_CURRENT_DESKTOP,wlroots
+                    exec-once=sh ~/.config/mango/autostart.sh
                     
                     # Additional environment variables for theming
                     env=GTK_THEME,Adwaita-dark
@@ -376,13 +384,58 @@ in
           autostart_sh = ''
                     set -e
 
-                    # wichtige envs an systemd/dbus durchreichen (hilft bei App-Autostart)
-                    dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=wlroots
-                    
-                    # optional: kleines Delay damit Mango fertig ist
-                    sleep 0.5
-                    
-                    wlr-randr --output HDMI-A-1 --output DVI-D-1 --right-of HDMI-A-1 &
+                    # Ensure portal services see the real Wayland socket in the user systemd env
+                    export XDG_SESSION_TYPE=wayland
+                    export XDG_CURRENT_DESKTOP=wlroots
+                    if [ -z "''${XDG_RUNTIME_DIR:-}" ]; then
+                      export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+                    fi
+                    for _ in $(seq 1 30); do
+                      if [ -z "''${WAYLAND_DISPLAY:-}" ] && [ -n "''${XDG_RUNTIME_DIR:-}" ]; then
+                        WAYLAND_DISPLAY="$(ls "''${XDG_RUNTIME_DIR}"/wayland-* 2>/dev/null | head -n1 | xargs -r basename || true)"
+                        export WAYLAND_DISPLAY
+                      fi
+                      if [ -n "''${WAYLAND_DISPLAY:-}" ] && [ -S "''${XDG_RUNTIME_DIR}/''${WAYLAND_DISPLAY}" ]; then
+                        break
+                      fi
+                      sleep 0.5
+                    done
+
+                    if [ -n "''${WAYLAND_DISPLAY:-}" ] && [ -S "''${XDG_RUNTIME_DIR}/''${WAYLAND_DISPLAY}" ]; then
+                      dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_SESSION_TYPE XDG_CURRENT_DESKTOP XDG_RUNTIME_DIR || true
+                      systemctl --user import-environment WAYLAND_DISPLAY XDG_SESSION_TYPE XDG_CURRENT_DESKTOP XDG_RUNTIME_DIR || true
+                    fi
+
+                    # Delay and retries for monitor setup: outputs may appear late after login.
+                    # First prefer known connector names, then fall back to the first two detected outputs.
+                    sleep 1
+                    layout_applied=0
+                    for _ in $(seq 1 45); do
+                      outputs="$(wlr-randr 2>/dev/null || true)"
+                      if printf '%s\n' "$outputs" | grep -q '^HDMI-A-1 ' && printf '%s\n' "$outputs" | grep -q '^DVI-D-1 '; then
+                        if wlr-randr --output HDMI-A-1 --output DVI-D-1 --right-of HDMI-A-1; then
+                          layout_applied=1
+                          break
+                        fi
+                      fi
+                      sleep 1
+                    done
+
+                    if [ "$layout_applied" -ne 1 ]; then
+                      detected_outputs="$(wlr-randr 2>/dev/null | awk '/^[A-Za-z0-9-]+ / { print $1 }' | tr '\n' ' ' || true)"
+                      set -- $detected_outputs
+                      if [ "$#" -ge 2 ]; then
+                        wlr-randr --output "$1" --output "$2" --right-of "$1" || true
+                      fi
+                    fi
+
+                    # Restart portals after outputs are visible and layout settled,
+                    # otherwise xdg-desktop-portal-wlr can start too early and fail
+                    # later with "wlroots: no output found" during share selection.
+                    if wlr-randr 2>/dev/null | grep -q '^[A-Za-z0-9-]\+ '; then
+                      systemctl --user restart xdg-desktop-portal-wlr.service || true
+                      systemctl --user restart xdg-desktop-portal.service || true
+                    fi
                     
                     # DankMaterialShell starten
                     dms run -d

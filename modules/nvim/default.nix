@@ -74,7 +74,21 @@ in
       shfmt
 
       # Kotlin
-      kotlin-language-server
+      # kotlin-language-server  # replaced by optimized wrapper below
+      (writeShellScriptBin "kotlin-language-server" ''
+        exec ${pkgs.openjdk21}/bin/java \
+          -Xmx2G \
+          -Xms512M \
+          -XX:+UseG1GC \
+          -XX:MaxGCPauseMillis=200 \
+          -XX:+UnlockExperimentalVMOptions \
+          -XX:G1NewSizePercent=20 \
+          -XX:G1MaxNewSizePercent=40 \
+          -XX:+UseStringDeduplication \
+          -XX:InitiatingHeapOccupancyPercent=45 \
+          -Dfile.encoding=UTF-8 \
+          -jar ${pkgs.kotlin-language-server}/share/kotlin-language-server/server/build/libs/server.jar "$@"
+      '')
       gradle
 
       nodejs
