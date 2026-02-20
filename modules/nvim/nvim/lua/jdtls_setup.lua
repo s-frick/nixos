@@ -117,25 +117,14 @@ function M.setup()
 		local dap_ok, dap = pcall(require, "dap")
 		if dap_ok then
 			jdtls.setup_dap({ hotcodereplace = "auto" })
-
-    -- Java-spezifische Test-Keymaps (nvim-jdtls)
-    vim.keymap.set("n", "<leader>tn", jdtls.test_nearest_method, { buffer = bufnr, desc = "Java: Test nearest" })
-    vim.keymap.set("n", "<leader>tN", jdtls.test_class, { buffer = bufnr, desc = "Java: Test class" })
-    --
-    -- vim.keymap.set("n", "<leader>tA", require("jdtls.jdtls_setup").test_all_test_classes, vim.tbl_extend("force", opts, { desc = "Java: All *Test.java in project" }))
-    -- vim.keymap.set("n", "<leader>tp", require("jdtls.jdtls_setup").test_current_package, vim.tbl_extend("force", opts, { desc = "Java: Tests in current package" }))
-
-    local dap_ok, dap = pcall(require, "dap")
-    if dap_ok then
-      jdtls.setup_dap({ hotcodereplace = "auto" })
-      if jdtls.setup_dap_main_class_config then
-        jdtls.setup_dap_main_class_config()
-      end
-      require("dap.ext.vscode").load_launchjs(vim.fn.getcwd() .. "/launch.json", {
-        java = { "java" }, -- mappe VSCode "type": "java" auf dap.adapters.java
-      })
-    end
-  end
+			if jdtls.setup_dap_main_class_config then
+				jdtls.setup_dap_main_class_config()
+			end
+			require("dap.ext.vscode").load_launchjs(vim.fn.getcwd() .. "/launch.json", {
+				java = { "java" }, -- mappe VSCode "type": "java" auf dap.adapters.java
+			})
+		end
+	end
 
 	local config = {
 		cmd = cmd,
@@ -183,8 +172,9 @@ function M.setup()
       -- workspace = workspace_dir,
       bundles = bundles,
     },
+  }
 
-	jdtls.start_or_attach(config)
+  jdtls.start_or_attach(config)
 end
 
 local function find_all_test_files(root_dir)

@@ -56,6 +56,9 @@ require("dap_ui_widgets").setup()
 require("gitsigns").setup({})
 require("completion").setup()
 
+-- Neo-tree
+require("neo_tree").setup()
+
 -- LSP
 -- vim.lsp.set_log_level("ERROR")
 -- vim.lsp.handlers["window/logMessage"] = function() end
@@ -100,6 +103,10 @@ require('lsp.ts_ls').setup({
   on_attach = keymap.on_attach,
 })
 require('lsp.kotlin_language_server').setup({
+  capabilities = capabilities,
+  on_attach = keymap.on_attach,
+})
+require('lsp.rust_analyzer').setup({
   capabilities = capabilities,
   on_attach = keymap.on_attach,
 })

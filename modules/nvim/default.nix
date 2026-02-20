@@ -66,6 +66,7 @@ in
       maven
       lua-language-server
       nixd
+      rust-analyzer
       nixfmt-rfc-style
       ripgrep
       fd
@@ -200,6 +201,10 @@ in
         mini-icons
         nvim-web-devicons
         vim-tmux-navigator
+
+        # File tree
+        neo-tree-nvim
+        nui-nvim
 
       ])
       ++ [
