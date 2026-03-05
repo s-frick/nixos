@@ -36,7 +36,7 @@ in
 
     plugins = with pkgs.obs-studio-plugins; [
       input-overlay
-      wlrobs                # Wayland Screen Capture (wlroots)
+      wlrobs # Wayland Screen Capture (wlroots)
       obs-pipewire-audio-capture
     ];
   };
@@ -65,6 +65,11 @@ in
       gp = "git pull";
       lg = "lazygit";
       vim = "nvim";
+      jakob = "TERM='xterm-256color' ssh -i ~/.ssh/old jakob@161.97.161.110 -t tmux new-session -A -s jakob";
+      solis = "ssh -i ~/.ssh/old sebi@84.46.252.212 -t tmux new-session -A -s solis";
+      benjamin = "TERM='xterm-256color' ssh -i ~/.ssh/old sebi@84.46.252.212 -t tmux new-session -A -s benjamin";
+      monkey = "TERM='xterm-256color' ssh monkey@45.159.228.222 -t tmux new-session -A -s monkey";
+      pg_ssh = "ssh -L 5432:localhost:5432 -i ~/.ssh/old sebi@84.46.252.212";
     };
 
     # optional: zusätzliche RC-Dateien / Einstellungen
@@ -112,7 +117,6 @@ in
     RPROMPT='$MODE_PROMPT'
   '';
 
-
   programs.tmux = {
     enable = true;
     # clock24 = true;
@@ -122,7 +126,7 @@ in
     keyMode = "vi";
     terminal = "tmux-256color";
 
-    plugins = with pkgs.tmuxPlugins; [ 
+    plugins = with pkgs.tmuxPlugins; [
       nord
       yank
       vim-tmux-navigator
@@ -182,7 +186,10 @@ in
     set preview_images_method kitty
   '';
 
-  home.sessionPath = [ "$HOME/.local/scripts" "$HOME/.local/bin"  ];
+  home.sessionPath = [
+    "$HOME/.local/scripts"
+    "$HOME/.local/bin"
+  ];
   home.file.".local/scripts/tmux-sessionizer" = {
     executable = true;
     text = ''
@@ -227,17 +234,17 @@ in
   home.file.".local/scripts/tmux-session-switcher" = {
     executable = true;
     text = ''
-        session="$(
-          tmux list-sessions -F "#{session_name}" 2>/dev/null |
-            fzf \
-              --prompt='tmux session > ' \
-              --preview 'tmux list-windows -t {}' \
-              --preview-window=right:60%:border-left
-        )" || exit 1
+      session="$(
+        tmux list-sessions -F "#{session_name}" 2>/dev/null |
+          fzf \
+            --prompt='tmux session > ' \
+            --preview 'tmux list-windows -t {}' \
+            --preview-window=right:60%:border-left
+      )" || exit 1
 
-        [ -z "$session" ] && exit 1
+      [ -z "$session" ] && exit 1
 
-        tmux switch-client -t "$session"
+      tmux switch-client -t "$session"
     '';
   };
   home.file.".local/scripts/rbw-fzf" = {
