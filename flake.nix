@@ -2,8 +2,7 @@
   description = "Multi-host NixOS + Home-Manager (one user)";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    nixpkgs-unstable = { url = "github:NixOS/nixpkgs/nixos-unstable"; };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
@@ -19,35 +18,33 @@
 
     dgop = {
       url = "github:AvengeMedia/dgop";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     dankMaterialShell = {
       url = "github:AvengeMedia/DankMaterialShell/stable";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
       # inputs.dgop.follows = "dgop";
     };
   };
 
-  outputs = { 
-    self, 
-    nixpkgs, 
-    nixpkgs-unstable, 
+  outputs = {
+    self,
+    nixpkgs,
     nixos-wsl,
-    home-manager, 
-    mangowc, 
-    dgop, 
-    dankMaterialShell, 
-    ... 
+    home-manager,
+    mangowc,
+    dgop,
+    dankMaterialShell,
+    ...
   }@inputs:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
     in {
       nixosConfigurations = {
         fuji = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs pkgs-unstable; };
+          specialArgs = { inherit inputs; };
           system = system;
           modules = [
             ./hosts/fuji/hardware.nix
@@ -57,7 +54,7 @@
         };
 
         silverback = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs pkgs-unstable; };
+          specialArgs = { inherit inputs; };
           system = system;
           modules = [
             ./hosts/silverback/hardware.nix
@@ -67,7 +64,7 @@
         };
 
         wsl = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs pkgs-unstable; };
+          specialArgs = { inherit inputs; };
           system = system;
           modules = [
             nixos-wsl.nixosModules.default

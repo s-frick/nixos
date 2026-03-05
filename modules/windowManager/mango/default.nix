@@ -1,5 +1,5 @@
 # modules/mango/default.nix
-{ config, lib, inputs, pkgs, pkgs-unstable, ... }:
+{ config, lib, inputs, pkgs, ... }:
 
 let
   cfg = config.desktop.mango;
@@ -78,10 +78,7 @@ in
 
     programs.mango.enable = true;
 
-    nixpkgs.overlays =
-      [ (final: prev: { quickshell = pkgs-unstable.quickshell; }) ];
-
-    environment.systemPackages = 
+    environment.systemPackages =
       (with pkgs; [
         adwaita-qt
         adwaita-icon-theme
@@ -125,7 +122,7 @@ in
 
     home-manager.users.sebi.imports = [
       inputs.mangowc.hmModules.mango
-      inputs.dankMaterialShell.homeModules.dankMaterialShell.default
+      inputs.dankMaterialShell.homeModules.dank-material-shell
 
       ({ ... }: {
         wayland.windowManager.mango = {
@@ -459,12 +456,12 @@ in
           platformTheme.name = "Adwaita-Dark";
         };
 
-        programs.dankMaterialShell = {
+        programs.dank-material-shell = {
           enable = true;
-          #quickshell.package = pkgs-unstable.quickshell;
+          #quickshell.package = pkgs.quickshell;
           systemd = {
             enable = true;             # Systemd service for auto-start
-            restartIfChanged = true;   # Auto-restart dms.service when dankMaterialShell changes
+            restartIfChanged = true;   # Auto-restart dms.service when dank-material-shell changes
           };
           
           # Core features

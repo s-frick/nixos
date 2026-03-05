@@ -67,7 +67,7 @@ in
       lua-language-server
       nixd
       rust-analyzer
-      nixfmt-rfc-style
+      nixfmt
       ripgrep
       fd
       stylua
