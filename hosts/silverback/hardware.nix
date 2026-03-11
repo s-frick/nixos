@@ -29,12 +29,14 @@
     { device = "/dev/disk/by-uuid/dcce5d9e-4bc9-46a0-afb9-5af22a62e27d";
       fsType = "btrfs";
       options = [ "subvol=@persist" ];
+      neededForBoot = true;
     };
 
   fileSystems."/home" =
     { device = "/dev/disk/by-uuid/dcce5d9e-4bc9-46a0-afb9-5af22a62e27d";
       fsType = "btrfs";
       options = [ "subvol=@home" ];
+      neededForBoot = true;
     };
 
   fileSystems."/var/log" =
