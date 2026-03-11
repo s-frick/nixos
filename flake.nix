@@ -26,6 +26,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
       # inputs.dgop.follows = "dgop";
     };
+
+    impermanence.url = "github:nix-community/impermanence";
   };
 
   outputs = {
@@ -36,6 +38,7 @@
     mangowc,
     dgop,
     dankMaterialShell,
+    impermanence,
     ...
   }@inputs:
     let

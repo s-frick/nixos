@@ -2,6 +2,7 @@
 {
   imports = [
     ../../modules/common
+    ./impermanence.nix
   ];
 
   # Bootloader.
