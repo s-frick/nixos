@@ -10,8 +10,8 @@
   #
   #   sudo mkdir -p /mnt/btrfs-root
   #   sudo mount -o subvol=/ /dev/disk/by-uuid/dcce5d9e-4bc9-46a0-afb9-5af22a62e27d /mnt/btrfs-root
-  #   sudo btrfs subvolume snapshot /mnt/btrfs-root/@root /mnt/btrfs-root/@root-blank
-  #   sudo btrfs subvolume snapshot /mnt/btrfs-root/@home /mnt/btrfs-root/@home-blank
+  #   sudo btrfs subvolume create /mnt/btrfs-root/@root-blank
+  #   sudo btrfs subvolume create /mnt/btrfs-root/@home-blank
   #   sudo umount /mnt/btrfs-root
   boot.initrd.postDeviceCommands = lib.mkAfter ''
     mkdir -p /mnt
