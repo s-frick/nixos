@@ -1,0 +1,8 @@
+keys:
+  - &sebi age164wmlucf6m357hfd5nmwcsvspk6fd3h6rms8wq2yyxcqjfzt53ssxdda6t
+
+creation_rules:
+  - path_regex: hosts/silverback/secrets\.yaml$
+    key_groups:
+      - age:
+          - *sebi

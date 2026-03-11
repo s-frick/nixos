@@ -3,6 +3,7 @@
   imports = [
     ../../modules/common
     ./impermanence.nix
+    ./sops.nix
   ];
 
   # Bootloader.
