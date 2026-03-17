@@ -25,6 +25,12 @@
     btrfs subvolume delete /mnt/@home || true
     btrfs subvolume snapshot /mnt/@home-blank /mnt/@home
 
+    # Persist machine-id into fresh root before systemd starts
+    if [ -f /mnt/@persist/etc/machine-id ]; then
+      mkdir -p /mnt/@root/etc
+      cp /mnt/@persist/etc/machine-id /mnt/@root/etc/machine-id
+    fi
+
     umount /mnt
   '';
 
@@ -42,7 +48,6 @@
     ];
 
     files = [
-      "/etc/machine-id"
     ];
 
     # ── User-level persistence (sebi) ─────────────────────────────────

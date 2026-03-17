@@ -85,34 +85,17 @@ function M.setup()
   --   return
   -- end
 
-  -- FIXME: keymaps on_attach is not called if jdtls is attached
+	local keymaps = require("keymaps")
+
 	local function on_attach(client, bufnr)
-		-- Standard-LSP-Keymaps
+		-- Standard-LSP-Keymaps (konsistent mit allen anderen Sprachen)
+		keymaps.on_attach(client, bufnr)
+
+		-- Java-spezifische Keymaps
 		local opts = { noremap = true, silent = true, buffer = bufnr }
-
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-		vim.keymap.set("n", "gd", require("telescope.builtin").lsp_definitions, opts)
-		vim.keymap.set("n", "gD", require("telescope.builtin").lsp_type_definitions, opts)
-		vim.keymap.set("n", "gi", require("telescope.builtin").lsp_implementations, opts)
-		vim.keymap.set("n", "gr", require("telescope.builtin").lsp_references, opts)
-
-		vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-		vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
 		vim.keymap.set("n", "<leader>cc", "<cmd>JdtCompile<CR>", opts)
-
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-    vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-    vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-    vim.keymap.set("n", "<leader>cc", "<cmd>JdtCompile<CR>", opts)
-
-		-- Java-spezifische Test-Keymaps (nvim-jdtls)
 		vim.keymap.set("n", "<leader>tn", jdtls.test_nearest_method, { buffer = bufnr, desc = "Java: Test nearest" })
 		vim.keymap.set("n", "<leader>tN", jdtls.test_class,         { buffer = bufnr, desc = "Java: Test class" })
-		--
-		-- vim.keymap.set("n", "<leader>tA", require("jdtls.jdtls_setup").test_all_test_classes, vim.tbl_extend("force", opts, { desc = "Java: All *Test.java in project" }))
-		-- vim.keymap.set("n", "<leader>tp", require("jdtls.jdtls_setup").test_current_package, vim.tbl_extend("force", opts, { desc = "Java: Tests in current package" }))
 
 		local dap_ok, dap = pcall(require, "dap")
 		if dap_ok then
@@ -121,7 +104,7 @@ function M.setup()
 				jdtls.setup_dap_main_class_config()
 			end
 			require("dap.ext.vscode").load_launchjs(vim.fn.getcwd() .. "/launch.json", {
-				java = { "java" }, -- mappe VSCode "type": "java" auf dap.adapters.java
+				java = { "java" },
 			})
 		end
 	end
@@ -129,6 +112,7 @@ function M.setup()
 	local config = {
 		cmd = cmd,
 		root_dir = root_dir,
+		on_attach = on_attach,
 		capabilities = capabilities,
 
     settings = {

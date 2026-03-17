@@ -188,6 +188,7 @@ in
           p.tsx
 
           p.kotlin
+          p.rust
 
         ]))
 
