@@ -76,22 +76,22 @@ require("neo_tree").setup()
 
 -- ===== LSP UX: Diagnostics, Signs, Keymaps, on_attach =====
 
--- hübschere Diagnostics
+-- Diagnostic configuration mit neuer API (Neovim 0.11+)
 vim.diagnostic.config({
   virtual_text = false, -- weniger Rauschen im Text
   float = { border = "rounded" },
   severity_sort = true,
-  signs = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "E ",
+      [vim.diagnostic.severity.WARN] = "⚠",
+      [vim.diagnostic.severity.HINT] = " ",
+      [vim.diagnostic.severity.INFO] = " ",
+    }
+  },
   underline = true,
 })
--- Zeichen in der Zeichenleiste
-local signs = { Error = "E ", Warn = "⚠", Hint = " ", Info = " " }
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-end
 
-local lspconfig = require('lspconfig')
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 require('lsp.lua_ls').setup({
@@ -112,10 +112,11 @@ require('lsp.rust_analyzer').setup({
 })
 
 -- Nix
-lspconfig.nixd.setup({
+vim.lsp.config('nixd', {
   capabilities = capabilities,
   on_attach = keymap.on_attach,
 })
+vim.lsp.enable('nixd')
 
 
 vim.api.nvim_create_autocmd("LspAttach", {

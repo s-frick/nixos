@@ -52,40 +52,23 @@ function M.setup()
     table.insert(bundles, jar)
   end
 
-	-- Executable für jdtls herausfinden (jdtls oder jdt-language-server)
-	local cmd
-	if vim.fn.executable("jdtls") == 1 then
-		cmd = { "jdtls", "-data", workspace_dir }
-	elseif vim.fn.executable("jdt-language-server") == 1 then
-		cmd = { "jdt-language-server", "-data", workspace_dir }
-	else
-		vim.notify("[jdtls] Kein 'jdtls' oder 'jdt-language-server' im PATH gefunden", vim.log.levels.ERROR)
-		return
-	end
-
-	if lombok_jar and lombok_jar ~= "" then
-		table.insert(cmd, "--jvm-arg=-javaagent:" .. lombok_jar)
-	end
-	table.insert(cmd, "--jvm-arg=-Xmx2g")
-
   -- FIXME: workaround for incompatible versions jdtls 1.52 and vscode-java-test
   -- statt "jdtls" / "jdt-language-server" aus PATH:
   local jdtls_bin =
   "/nix/store/wkyckfdj74z7gzk43fifla50vcyx3540-jdt-language-server-1.46.1/bin/jdtls" -- pinned due to asm range mismatch with vscode-java-test
   local cmd = { jdtls_bin, "--data", workspace_dir }
 
-  -- Executable für jdtls herausfinden (jdtls oder jdt-language-server)
-  -- local cmd
-  -- if vim.fn.executable("jdtls") == 1 then
-  --   cmd = { "jdtls", "--data", workspace_dir }
-  -- elseif vim.fn.executable("jdt-language-server") == 1 then
-  --   cmd = { "jdt-language-server", "-data", workspace_dir }
-  -- else
-  --   vim.notify("[jdtls] Kein 'jdtls' oder 'jdt-language-server' im PATH gefunden", vim.log.levels.ERROR)
-  --   return
-  -- end
+  -- Lombok JVM Argument hinzufügen
+  local lombok_jar = os.getenv("LOMBOK_JAR")
+  if lombok_jar and lombok_jar ~= "" then
+    table.insert(cmd, "--jvm-arg=-javaagent:" .. lombok_jar)
+  end
+  table.insert(cmd, "--jvm-arg=-Xmx2g")
 
 	local keymaps = require("keymaps")
+
+  -- capabilities für LSP von nvim-cmp holen
+  local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 	local function on_attach(client, bufnr)
 		-- Standard-LSP-Keymaps (konsistent mit allen anderen Sprachen)
@@ -103,9 +86,7 @@ function M.setup()
 			if jdtls.setup_dap_main_class_config then
 				jdtls.setup_dap_main_class_config()
 			end
-			require("dap.ext.vscode").load_launchjs(vim.fn.getcwd() .. "/launch.json", {
-				java = { "java" },
-			})
+			-- launch.json wird automatisch von nvim-dap geladen
 		end
 	end
 
@@ -144,7 +125,10 @@ function M.setup()
           gradle = { enabled = true, wrapper = { enabled = true } },
         },
         eclipse = { downloadSources = true },
-        maven = { downloadSources = true },
+        maven = { 
+          downloadSources = true,
+          updateSnapshots = true  -- Wichtig für Multi-Module mit SNAPSHOT Dependencies
+        },
         implementationsCodeLens = { enabled = true },
         referencesCodeLens = { enabled = true },
         references = { enabled = true, includeDecompiledSources = true },

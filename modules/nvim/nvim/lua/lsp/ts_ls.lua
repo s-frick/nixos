@@ -1,4 +1,4 @@
-local util = require('lspconfig').util
+local util = require('lspconfig.util')
 return {
   setup = function(opts)
     vim.lsp.config('ts_ls', {
