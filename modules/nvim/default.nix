@@ -5,6 +5,8 @@
   ...
 }:
 let
+  haskellToolchain = pkgs.haskell.packages.ghc96;
+
   # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
   #   pname = "neotest-jdtls";
   #   version = "dev";
@@ -56,7 +58,7 @@ in
     [
       tmux
 
-      openjdk21
+      openjdk25
       jdt-language-server
       lombok
       # (writeShellScriptBin "jdtls-lombok" ''
@@ -65,6 +67,9 @@ in
       # '')
       maven
       lua-language-server
+      haskellToolchain.ghc
+      haskellToolchain.haskell-language-server
+      cabal-install
       nixd
       rust-analyzer
       nixfmt
@@ -144,7 +149,6 @@ in
         }))
         #nvim-jdtls
         nvim-lspconfig
-        vim-wakatime
 
         nvim-dap
         nvim-cmp
@@ -170,6 +174,7 @@ in
         # Syntax/Parsing
         (nvim-treesitter.withPlugins (p: [
           p.java
+          p.haskell
           p.lua
           p.nix
           p.bash

@@ -5,12 +5,13 @@
     ./impermanence.nix
     ./sops.nix
   ];
-
+  nix.settings.secret-key-files = [ "/home/sebi/.config/nix/signing-key.sec" ];
+  nix.settings.trusted-users = [ "root" "sebi" ];
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   users.users.sebi.isNormalUser = true;
-  
+
   services.udev.extraRules = ''
     # Rules for Oryx web flashing and live training
     KERNEL=="hidraw*", ATTRS{idVendor}=="16c0", MODE="0664", GROUP="plugdev"
@@ -44,8 +45,6 @@
 
   desktop.mango.enable = true;
   desktop.mango.enableDms = true;
-
-
 
   # fuji-spezifische Systempakete
   environment.systemPackages = with pkgs; [

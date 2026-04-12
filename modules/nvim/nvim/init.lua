@@ -98,6 +98,10 @@ require('lsp.lua_ls').setup({
   capabilities = capabilities,
   on_attach = keymap.on_attach,
 })
+require('lsp.hls').setup({
+  capabilities = capabilities,
+  on_attach = keymap.on_attach,
+})
 require('lsp.ts_ls').setup({
   capabilities = capabilities,
   on_attach = keymap.on_attach,
@@ -123,6 +127,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("lsp", { clear = true }),
   callback = function(args)
     local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+
+    keymap.on_attach(client, args.buf)
 
     -- Formatting
     if not client:supports_method('textDocument/willSaveWaitUntil')
