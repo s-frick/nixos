@@ -98,10 +98,10 @@ in
       gradle
 
       nodejs
-      nodePackages_latest.typescript
-      nodePackages_latest.typescript-language-server
+      typescript
+      typescript-language-server
 
-      nodePackages_latest.prettier
+      prettier
       prettierd
       eslint_d
 
@@ -135,6 +135,7 @@ in
     # Falls du Node/Python-Provider für Plugins brauchst (Telescope, Treesitter, etc.)
     withNodeJs = true;
     withPython3 = true;
+    withRuby = true;
 
     plugins =
       (with pkgs.vimPlugins; [

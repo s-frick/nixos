@@ -3,6 +3,18 @@
 
 let
   cfg = config.desktop.mango;
+  screenshotRegion = pkgs.writeShellScriptBin "mango-screenshot-region" ''
+    set -eu
+
+    dir="''${XDG_SCREENSHOTS_DIR:-''${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots}"
+    mkdir -p "$dir"
+
+    geometry="$(${pkgs.slurp}/bin/slurp)" || exit 0
+    file="$dir/$(date +%Y-%m-%d_%H-%M-%S).png"
+
+    ${pkgs.grim}/bin/grim -g "$geometry" "$file"
+    ${pkgs.libnotify}/bin/notify-send "Screenshot gespeichert" "$file" || true
+  '';
 in
 {
   options.desktop.mango = {
@@ -93,6 +105,7 @@ in
         xdg-desktop-portal-wlr
         grim
         slurp
+        screenshotRegion
 
         coreutils-full
         gnumake
@@ -203,7 +216,6 @@ in
                     no_border_when_single=0
                     axis_bind_apply_timeout=100
                     focus_on_activate=1
-                    inhibit_regardless_of_visibility=0
                     sloppyfocus=1
                     warpcursor=1
                     focus_cross_monitor=0
@@ -277,7 +289,7 @@ in
                     bind=SUPER,Return,spawn,kitty
                     bind=SUPER+SHIFT,f,spawn,brave --ozone-platform-hint=auto --enable-features=WebRTCPipeWireCapturer
                     bind=SUPER,d,spawn,dms ipc call spotlight open
-                    bind=SUPER+SHIFT,s,spawn,./scripts/take_screenshot
+                    bind=SUPER+SHIFT,s,spawn,mango-screenshot-region
   
                     # monitor switch
                     bind=alt+shift,h,focusmon,left
@@ -357,13 +369,12 @@ in
                     bind=SUPER+SHIFT,r,togglegaps
   
                     # Mouse Button Bindings
-                    # NONE mode key only work in ov mode
                     mousebind=SUPER,btn_left,moveresize,curmove
                     mousebind=SUPER,btn_right,moveresize,curresize
                     mousebind=SUPER+CTRL,btn_right,killclient
-                    mousebind=NONE,btn_middle,togglemaximizescreen,0
-                    mousebind=NONE,btn_left,toggleoverview,1
-                    mousebind=NONE,btn_right,killclient,0
+                    mousebind=SUPER+SHIFT,btn_middle,togglemaximizescreen,0
+                    mousebind=SUPER+SHIFT,btn_left,toggleoverview,1
+                    mousebind=SUPER+SHIFT,btn_right,killclient,0
   
                     # Environment variables
                     env=XCURSOR_SIZE,24
@@ -442,6 +453,10 @@ in
         gtk = {
           enable = true;
           theme = {
+            name = "Adwaita-dark";
+            package = pkgs.gnome-themes-extra;
+          };
+          gtk4.theme = {
             name = "Adwaita-dark";
             package = pkgs.gnome-themes-extra;
           };
