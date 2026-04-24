@@ -45,6 +45,7 @@
 
   desktop.mango.enable = true;
   desktop.mango.enableDms = true;
+  desktop.mango.enableGreeter = true;
 
   # fuji-spezifische Systempakete
   environment.systemPackages = with pkgs; [

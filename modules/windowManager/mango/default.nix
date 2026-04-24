@@ -26,6 +26,8 @@ in
     };
 
     enableDms = lib.mkEnableOption "Enable DankMaterialShell / dms";
+
+    enableGreeter = lib.mkEnableOption "Enable the DankMaterialShell greeter (greetd-based login manager)";
   };
 
   imports = [
@@ -132,6 +134,12 @@ in
         ]
       )
       ++ cfg.extraPackages;
+
+    programs.dank-material-shell.greeter = lib.mkIf cfg.enableGreeter {
+      enable = true;
+      compositor.name = "mango";
+      configHome = "/home/sebi";
+    };
 
     home-manager.users.sebi.imports = [
       inputs.mangowc.hmModules.mango
