@@ -51,6 +51,24 @@ let
     };
     doCheck = false;
   };
+  tree-sitter-cli = pkgs.tree-sitter.overrideAttrs (old: rec {
+    version = "0.26.1";
+    src = pkgs.fetchFromGitHub {
+      owner = "tree-sitter";
+      repo = "tree-sitter";
+      rev = "v${version}";
+      hash = "sha256-k8X2qtxUne8C6znYAKeb4zoBf+vffmcJZQHUmBvsilA=";
+    };
+    cargoHash = "sha256-hnFHYQ8xPNFqic1UYygiLBWu3n82IkTJuQvgcXcMdv0=";
+    cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+      inherit src;
+      hash = "sha256-hnFHYQ8xPNFqic1UYygiLBWu3n82IkTJuQvgcXcMdv0=";
+    };
+    nativeBuildInputs = old.nativeBuildInputs ++ [ pkgs.llvmPackages.libclang ];
+    LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
+    BINDGEN_EXTRA_CLANG_ARGS = "-isystem ${pkgs.glibc.dev}/include";
+    patches = [ ];
+  });
 in
 {
   home.packages = lib.mkAfter (
@@ -136,6 +154,11 @@ in
     withNodeJs = true;
     withPython3 = true;
     withRuby = true;
+
+    extraPackages = with pkgs; [
+      tree-sitter-cli
+      (python3.withPackages (ps: [ ps.pynvim ]))
+    ];
 
     plugins =
       (with pkgs.vimPlugins; [

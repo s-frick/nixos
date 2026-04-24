@@ -10,6 +10,7 @@ in
 {
   imports = [
     ../nvim
+    ../forgejo-mcp
   ];
   home.packages = with pkgs; [
     tmux

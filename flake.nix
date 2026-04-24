@@ -27,6 +27,11 @@
       # inputs.dgop.follows = "dgop";
     };
 
+    forgejo-mcp-src = {
+      url = "git+https://codeberg.org/goern/forgejo-mcp";
+      flake = false;
+    };
+
     impermanence.url = "github:nix-community/impermanence";
 
     sops-nix = {
@@ -43,6 +48,7 @@
     mangowc,
     dgop,
     dankMaterialShell,
+    forgejo-mcp-src,
     impermanence,
     sops-nix,
     ...

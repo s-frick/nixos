@@ -1,6 +1,10 @@
 -- Leader
 vim.g.mapleader = " "
 
+-- Optional remote plugin providers not used by this config
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+
 -- Basics
 vim.opt.number = true
 vim.opt.relativenumber = true
