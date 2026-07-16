@@ -2,15 +2,21 @@
 {
   imports = [
     ../../modules/common
+    ../../modules/oom
     ./impermanence.nix
     ./sops.nix
   ];
   nix.settings.secret-key-files = [ "/home/sebi/.config/nix/signing-key.sec" ];
-  nix.settings.trusted-users = [ "root" "sebi" ];
+  nix.settings.trusted-users = [
+    "root"
+    "sebi"
+  ];
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   users.users.sebi.isNormalUser = true;
+
+  programs.nix-ld.enable = true;
 
   services.udev.extraRules = ''
     # Rules for Oryx web flashing and live training
@@ -54,6 +60,7 @@
 
   virtualisation.podman.enable = true;
   virtualisation.podman.dockerCompat = true;
+  virtualisation.podman.dockerSocket.enable = true;
   # fuji-spezifische Home-Manager-Erweiterungen für sebi
   home-manager.users.sebi.imports = [
     ./home.nix

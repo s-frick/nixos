@@ -389,8 +389,7 @@ in
                     env=XCURSOR_THEME,Adwaita-dark
                     env=XDG_SESSION_TYPE,wayland
                     env=XDG_CURRENT_DESKTOP,wlroots
-                    exec-once=sh ~/.config/mango/autostart.sh
-                    
+
                     # Additional environment variables for theming
                     env=GTK_THEME,Adwaita-dark
                     env=ICON_THEME,Adwaita-dark

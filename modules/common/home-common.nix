@@ -11,6 +11,8 @@ in
   imports = [
     ../nvim
     ../forgejo-mcp
+    ../claude-caveman
+    ../rtk
   ];
   home.packages = with pkgs; [
     tmux
