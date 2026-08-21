@@ -184,7 +184,6 @@ in
         friendly-snippets
         todo-comments-nvim
         markview-nvim
-        diagram-nvim
         image-nvim
 
         nvim-dap-view
@@ -228,6 +227,7 @@ in
         gitsigns-nvim
         which-key-nvim
         catppuccin-nvim
+        gruber-darker-nvim
         mini-icons
         nvim-web-devicons
         vim-tmux-navigator

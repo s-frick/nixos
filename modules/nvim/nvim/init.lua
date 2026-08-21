@@ -46,7 +46,16 @@ local todo_comments = require("todo_comments")
 todo_comments.setup()
 
 -- Theme
-vim.cmd.colorscheme("catppuccin")
+require("gruber-darker").setup({
+  bold = true,
+  italic = {
+    strings = false,
+    comments = true,
+    operators = false,
+    folds = true,
+  },
+})
+vim.cmd.colorscheme("gruber-darker")
 
 -- Lualine
 require("lualine").setup({

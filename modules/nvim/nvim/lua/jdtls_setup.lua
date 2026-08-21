@@ -47,9 +47,15 @@ function M.setup()
     table.insert(bundles, jar)
   end
 
-  -- Test (nur plugin)
-  for _, jar in ipairs(vim.fn.glob(test_dir .. "/com.microsoft.java.test.plugin-*.jar", 1, 1)) do
-    table.insert(bundles, jar)
+  -- Test: alle OSGi-Bundles aus dem server-Verzeichnis, nicht nur das Plugin.
+  -- Das Plugin benötigt u.a. org.eclipse.jdt.junit4.runtime, die jdtls selbst
+  -- nicht mehr mitliefert — die Jars liegen im Extension-Verzeichnis daneben.
+  -- Ausgenommen: Nicht-OSGi-Jars, die das Bundle-Loading brechen.
+  for _, jar in ipairs(vim.fn.glob(test_dir .. "/*.jar", 1, 1)) do
+    local name = vim.fn.fnamemodify(jar, ":t")
+    if not name:match("runner%-jar%-with%-dependencies") and not name:match("jacocoagent") then
+      table.insert(bundles, jar)
+    end
   end
 
 	-- Executable für jdtls herausfinden (jdtls oder jdt-language-server)
