@@ -34,25 +34,25 @@ in
     showmethekey
   ];
 
-  programs.obs-studio = {
-    enable = true;
+  # programs.obs-studio = {
+  #   enable = true;
+  #
+  #   plugins = with pkgs.obs-studio-plugins; [
+  #     input-overlay
+  #     wlrobs # Wayland Screen Capture (wlroots)
+  #     obs-pipewire-audio-capture
+  #   ];
+  # };
 
-    plugins = with pkgs.obs-studio-plugins; [
-      input-overlay
-      wlrobs # Wayland Screen Capture (wlroots)
-      obs-pipewire-audio-capture
-    ];
-  };
-
-  home.file.".local/bin/obs-x11" = {
-    executable = true;
-    text = ''
-      #!${pkgs.bash}/bin/bash
-      QT_QPA_PLATFORM=xcb exec obs "$@"
-    '';
-  };
-
-  xdg.configFile."obs-input-overlay/presets".source = "${input-overlay-presets}/presets";
+  # home.file.".local/bin/obs-x11" = {
+  #   executable = true;
+  #   text = ''
+  #     #!${pkgs.bash}/bin/bash
+  #     QT_QPA_PLATFORM=xcb exec obs "$@"
+  #   '';
+  # };
+  #
+  # xdg.configFile."obs-input-overlay/presets".source = "${input-overlay-presets}/presets";
 
   programs.zsh = {
     enable = true;
@@ -73,6 +73,8 @@ in
       benjamin = "TERM='xterm-256color' ssh -i ~/.ssh/old sebi@84.46.252.212 -t tmux new-session -A -s benjamin";
       monkey = "TERM='xterm-256color' ssh monkey@45.159.228.222 -t tmux new-session -A -s monkey";
       pg_ssh = "ssh -L 5432:localhost:5432 -i ~/.ssh/old sebi@84.46.252.212";
+
+      swan = "TERM='xterm-256color' ssh sfrick@38.242.225.236 -p 2021 -t tmux new-session -A -s swan";
     };
 
     # optional: zusätzliche RC-Dateien / Einstellungen

@@ -21,6 +21,8 @@
     zlib
     icu
   ];
+  virtualisation.podman.enable = true;
+  virtualisation.podman.dockerCompat = true;
 
   # wsl-spezifische Home-Manager-Erweiterungen für sebi
   home-manager.users.sebi.imports = [
