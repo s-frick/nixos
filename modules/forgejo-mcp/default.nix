@@ -12,7 +12,7 @@ let
 
     # Nach dem ersten `nix build` schlägt dieser Hash fehl und zeigt den
     # korrekten Wert — diesen dann hier eintragen.
-    vendorHash = "sha256-5CV4drUaYKtZ/RoydAatblhsqU8VWYzYByjhcb9KZVY=";
+    vendorHash = "sha256-QDJRbF4mZzBv1vxvo1ZQJaUJayRHj1jMgjaRfAmLMik=";
 
     meta = {
       description = "MCP server for Forgejo – connects AI assistants to Forgejo repositories";
