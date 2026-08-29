@@ -11,6 +11,7 @@
   # wsl-spezifische Systempakete
   environment.systemPackages = with pkgs; [
     git-credential-oauth
+    podman-compose
   ];
   # vscode wsl nixos support
   programs.nix-ld.enable = true;
@@ -23,6 +24,7 @@
   ];
   virtualisation.podman.enable = true;
   virtualisation.podman.dockerCompat = true;
+  virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
 
   # wsl-spezifische Home-Manager-Erweiterungen für sebi
   home-manager.users.sebi.imports = [
