@@ -19,26 +19,34 @@
   #   sudo btrfs subvolume create /mnt/btrfs-root/@root-blank
   #   sudo btrfs subvolume create /mnt/btrfs-root/@home-blank
   #   sudo umount /mnt/btrfs-root
-  boot.initrd.postDeviceCommands = lib.mkAfter ''
-    mkdir -p /mnt
-    mount -o subvol=/ /dev/disk/by-uuid/dcce5d9e-4bc9-46a0-afb9-5af22a62e27d /mnt
+  boot.initrd.systemd.services.rollback-root-home = {
+    description = "Rollback @root and @home btrfs subvolumes to blank snapshots";
+    after = [ "dev-disk-by\\x2duuid-dcce5d9e\\x2d4bc9\\x2d46a0\\x2dafb9\\x2d5af22a62e27d.device" ];
+    before = [ "sysroot.mount" ];
+    requiredBy = [ "sysroot.mount" ];
+    unitConfig.DefaultDependencies = false;
+    serviceConfig.Type = "oneshot";
+    script = ''
+      mkdir -p /mnt
+      mount -o subvol=/ /dev/disk/by-uuid/dcce5d9e-4bc9-46a0-afb9-5af22a62e27d /mnt
 
-    # Rollback @root
-    btrfs subvolume delete /mnt/@root || true
-    btrfs subvolume snapshot /mnt/@root-blank /mnt/@root
+      # Rollback @root
+      btrfs subvolume delete /mnt/@root || true
+      btrfs subvolume snapshot /mnt/@root-blank /mnt/@root
 
-    # Rollback @home
-    btrfs subvolume delete /mnt/@home || true
-    btrfs subvolume snapshot /mnt/@home-blank /mnt/@home
+      # Rollback @home
+      btrfs subvolume delete /mnt/@home || true
+      btrfs subvolume snapshot /mnt/@home-blank /mnt/@home
 
-    # Persist machine-id into fresh root before systemd starts
-    if [ -f /mnt/@persist/etc/machine-id ]; then
-      mkdir -p /mnt/@root/etc
-      cp /mnt/@persist/etc/machine-id /mnt/@root/etc/machine-id
-    fi
+      # Persist machine-id into fresh root before systemd starts
+      if [ -f /mnt/@persist/etc/machine-id ]; then
+        mkdir -p /mnt/@root/etc
+        cp /mnt/@persist/etc/machine-id /mnt/@root/etc/machine-id
+      fi
 
-    umount /mnt
-  '';
+      umount /mnt
+    '';
+  };
 
   # ── System-level persistence ──────────────────────────────────────────
   environment.persistence."/persist" = {
