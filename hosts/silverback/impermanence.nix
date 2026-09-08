@@ -27,8 +27,17 @@
     requiredBy = [ "sysroot.mount" ];
     unitConfig.DefaultDependencies = false;
     serviceConfig.Type = "oneshot";
+    # Without this the unit goes inactive after finishing and gets started a
+    # second time when initrd-parse-etc triggers a daemon-reload and the
+    # sysroot.mount Requires= is re-evaluated. That second run deleted @root
+    # while it was mounted as /sysroot.
+    serviceConfig.RemainAfterExit = true;
     script = ''
       set -euo pipefail
+      if mountpoint -q /sysroot; then
+        echo "rollback: /sysroot already mounted, refusing to run again" >&2
+        exit 1
+      fi
       dev=/dev/disk/by-uuid/dcce5d9e-4bc9-46a0-afb9-5af22a62e27d
       top=/btrfs-top
       mkdir -p "$top"
