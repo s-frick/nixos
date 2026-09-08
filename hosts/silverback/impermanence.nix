@@ -22,31 +22,48 @@
   boot.initrd.systemd.services.rollback-root-home = {
     description = "Rollback @root and @home btrfs subvolumes to blank snapshots";
     after = [ "dev-disk-by\\x2duuid-dcce5d9e\\x2d4bc9\\x2d46a0\\x2dafb9\\x2d5af22a62e27d.device" ];
+    requires = [ "dev-disk-by\\x2duuid-dcce5d9e\\x2d4bc9\\x2d46a0\\x2dafb9\\x2d5af22a62e27d.device" ];
     before = [ "sysroot.mount" ];
     requiredBy = [ "sysroot.mount" ];
     unitConfig.DefaultDependencies = false;
     serviceConfig.Type = "oneshot";
     script = ''
-      mkdir -p /mnt
-      mount -o subvol=/ /dev/disk/by-uuid/dcce5d9e-4bc9-46a0-afb9-5af22a62e27d /mnt
+      set -euo pipefail
+      dev=/dev/disk/by-uuid/dcce5d9e-4bc9-46a0-afb9-5af22a62e27d
+      top=/btrfs-top
+      mkdir -p "$top"
+      mount -o subvol=/ "$dev" "$top"
+      trap 'umount -R "$top" || true' EXIT
 
-      # Rollback @root
-      btrfs subvolume delete /mnt/@root || true
-      btrfs subvolume snapshot /mnt/@root-blank /mnt/@root
+      rollback() {
+        local sub="$1" blank="$2"
+        # -R: delete nested subvolumes too. systemd-tmpfiles q/Q rules
+        # (tmp, var/tmp, var/lib/machines, var/lib/portables) recreate
+        # them on every boot because / is a btrfs subvolume.
+        if [ -e "$top/$sub" ]; then
+          btrfs subvolume delete -R "$top/$sub"
+        fi
+        if [ -e "$top/$sub" ]; then
+          echo "rollback: $sub still exists after delete, refusing to snapshot into it" >&2
+          exit 1
+        fi
+        btrfs subvolume snapshot "$top/$blank" "$top/$sub"
+      }
 
-      # Rollback @home
-      btrfs subvolume delete /mnt/@home || true
-      btrfs subvolume snapshot /mnt/@home-blank /mnt/@home
+      rollback @root @root-blank
+      rollback @home @home-blank
 
       # Persist machine-id into fresh root before systemd starts
-      if [ -f /mnt/@persist/etc/machine-id ]; then
-        mkdir -p /mnt/@root/etc
-        cp /mnt/@persist/etc/machine-id /mnt/@root/etc/machine-id
+      if [ -f "$top/@persist/etc/machine-id" ]; then
+        mkdir -p "$top/@root/etc"
+        cp "$top/@persist/etc/machine-id" "$top/@root/etc/machine-id"
       fi
-
-      umount /mnt
     '';
   };
+
+  # Drop into an emergency shell with journal on any stage-1 failure
+  # instead of hanging without a way to inspect the initrd.
+  boot.initrd.systemd.emergencyAccess = true;
 
   # ── System-level persistence ──────────────────────────────────────────
   environment.persistence."/persist" = {
