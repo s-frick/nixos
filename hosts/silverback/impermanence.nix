@@ -34,7 +34,7 @@
     serviceConfig.RemainAfterExit = true;
     script = ''
       set -euo pipefail
-      if mountpoint -q /sysroot; then
+      if grep -qs " /sysroot " /proc/self/mounts; then
         echo "rollback: /sysroot already mounted, refusing to run again" >&2
         exit 1
       fi
