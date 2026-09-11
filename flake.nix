@@ -40,23 +40,25 @@
     };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    nixos-wsl,
-    home-manager,
-    mangowc,
-    dgop,
-    dankMaterialShell,
-    forgejo-mcp-src,
-    impermanence,
-    sops-nix,
-    ...
-  }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nixos-wsl,
+      home-manager,
+      mangowc,
+      dgop,
+      dankMaterialShell,
+      forgejo-mcp-src,
+      impermanence,
+      sops-nix,
+      ...
+    }@inputs:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-    in {
+    in
+    {
       nixosConfigurations = {
         fuji = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit inputs; };
@@ -88,15 +90,29 @@
           ];
         };
       };
+      # Standalone Home-Manager (Nix Package Manager auf Ubuntu/WSL, kein NixOS)
+      homeConfigurations."sebi@ubuntu" = home-manager.lib.homeManagerConfiguration {
+        pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
+        extraSpecialArgs = { inherit inputs; };
+        modules = [
+          ./hosts/ubuntu/home.nix
+        ];
+      };
+
       # === Add custom build target ===
       packages.${system}.buildAll =
         let
           systems = builtins.attrValues self.nixosConfigurations;
           toplevels = map (cfg: cfg.config.system.build.toplevel) systems;
         in
-          pkgs.runCommand "build-all" {
+        pkgs.runCommand "build-all"
+          {
             buildInputs = toplevels;
-          } ''
+          }
+          ''
             mkdir -p $out
           '';
     };

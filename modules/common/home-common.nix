@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 let
   input-overlay-presets = pkgs.fetchFromGitHub {
     owner = "univrsal";
@@ -9,11 +9,10 @@ let
 in
 {
   imports = [
+    ./home-options.nix
     ../nvim
-    ../forgejo-mcp
-    ../claude-caveman
-    ../rtk
   ];
+
   home.packages = with pkgs; [
     tmux
     fd
@@ -23,15 +22,14 @@ in
     eza
     tree
 
-    rbw
-    pinentry-all
-
     lazygit
     httpyac
     jq
     yq
     ranger
-    showmethekey
+  ] ++ lib.optionals config.my.rbw.enable [
+    rbw
+    pinentry-all
   ];
 
   # programs.obs-studio = {
@@ -84,7 +82,7 @@ in
       export EDITOR="nvim"
       bindkey -v
       bindkey -s ^f "tmux-sessionizer\n"
-      bindkey -s ^p "rbw-fzf\n"
+      ${lib.optionalString config.my.rbw.enable ''bindkey -s ^p "rbw-fzf\n"''}
       bindkey -s ^e "ranger\n"
 
       MODE_PROMPT="%F{red}[N]%f"
@@ -204,10 +202,8 @@ in
           selected=$1
       else
           selected=$(
-            find ~/git/work ~/git/private ~/git/old/probes \
-                 ~/git/old/private ~/git/old/learning ~/git/monkey \
-                 ~/git/foss ~/git/learning \
-                 -mindepth 1 -maxdepth 1 -type d | 
+            find ${lib.concatStringsSep " " config.my.tmuxSessionizer.paths} \
+                 -mindepth 1 -maxdepth 1 -type d 2>/dev/null |
             fzf --preview 'eza --tree --level=2 --color=always --git-ignore {}' \
                 --preview-window=right:60%
             )
@@ -253,6 +249,7 @@ in
     '';
   };
   home.file.".local/scripts/rbw-fzf" = {
+    enable = config.my.rbw.enable;
     executable = true;
     text = ''
       set -eu
