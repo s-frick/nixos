@@ -39,23 +39,43 @@ function M.setup()
 	-- Bundles (Debug + Test) aus Env-Vars
 	local bundles = {}
 
+  -- Die Verzeichnisse kommen aus home.sessionVariables. Fehlen sie (z.B. Shell
+  -- älter als der letzte home-manager switch), läuft jdtls ohne Debug/Test
+  -- weiter statt den ganzen FileType-Autocmd zu sprengen.
   local debug_dir = os.getenv("JAVA_DEBUG_SERVER_DIR")
   local test_dir = os.getenv("JAVA_TEST_SERVER_DIR")
+  local missing = {}
 
   -- Debug
-  for _, jar in ipairs(vim.fn.glob(debug_dir .. "/com.microsoft.java.debug.plugin-*.jar", 1, 1)) do
-    table.insert(bundles, jar)
+  if debug_dir and debug_dir ~= "" then
+    for _, jar in ipairs(vim.fn.glob(debug_dir .. "/com.microsoft.java.debug.plugin-*.jar", 1, 1)) do
+      table.insert(bundles, jar)
+    end
+  else
+    table.insert(missing, "JAVA_DEBUG_SERVER_DIR")
   end
 
   -- Test: alle OSGi-Bundles aus dem server-Verzeichnis, nicht nur das Plugin.
   -- Das Plugin benötigt u.a. org.eclipse.jdt.junit4.runtime, die jdtls selbst
   -- nicht mehr mitliefert — die Jars liegen im Extension-Verzeichnis daneben.
   -- Ausgenommen: Nicht-OSGi-Jars, die das Bundle-Loading brechen.
-  for _, jar in ipairs(vim.fn.glob(test_dir .. "/*.jar", 1, 1)) do
-    local name = vim.fn.fnamemodify(jar, ":t")
-    if not name:match("runner%-jar%-with%-dependencies") and not name:match("jacocoagent") then
-      table.insert(bundles, jar)
+  if test_dir and test_dir ~= "" then
+    for _, jar in ipairs(vim.fn.glob(test_dir .. "/*.jar", 1, 1)) do
+      local name = vim.fn.fnamemodify(jar, ":t")
+      if not name:match("runner%-jar%-with%-dependencies") and not name:match("jacocoagent") then
+        table.insert(bundles, jar)
+      end
     end
+  else
+    table.insert(missing, "JAVA_TEST_SERVER_DIR")
+  end
+
+  if #missing > 0 then
+    vim.notify(
+      "[jdtls] " .. table.concat(missing, ", ") .. " nicht gesetzt — Debug/Test-Bundles fehlen. "
+        .. "Neue Login-Shell starten (exec zsh -l) bzw. tmux-Server neu starten.",
+      vim.log.levels.WARN
+    )
   end
 
 	-- Executable für jdtls herausfinden (jdtls oder jdt-language-server)
