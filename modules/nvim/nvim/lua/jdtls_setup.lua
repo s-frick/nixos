@@ -93,7 +93,7 @@ function M.setup()
 	if lombok_jar and lombok_jar ~= "" then
 		table.insert(cmd, "--jvm-arg=-javaagent:" .. lombok_jar)
 	end
-	table.insert(cmd, "--jvm-arg=-Xmx2g")
+	table.insert(cmd, "--jvm-arg=-Xmx8g")
 
 	local keymaps = require("keymaps")
 
