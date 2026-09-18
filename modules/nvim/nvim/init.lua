@@ -1,3 +1,5 @@
+-- projektlokale Konfigurationen zulassen
+vim.o.exrc = true
 -- Leader
 vim.g.mapleader = " "
 
