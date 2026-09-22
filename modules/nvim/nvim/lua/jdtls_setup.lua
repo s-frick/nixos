@@ -163,6 +163,7 @@ function M.setup()
       maven = {
         downloadSources = true,
         updateSnapshots = true,
+        userSettings = home .. "/.m2/settings.xml"
       },
 
       implementationsCodeLens = { enabled = true },
