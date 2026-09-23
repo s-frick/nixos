@@ -64,9 +64,10 @@ function M.setup()
     },
 
     filesystem = {
+      hijack_netrw_behavior = "disabled", -- netrw bleibt für :Ex erhalten
       follow_current_file = {
         enabled = true,
-        leave_dirs_open = false,
+        leave_dirs_open = true,
       },
       use_libuv_file_watcher = true,
       filtered_items = {
@@ -87,7 +88,7 @@ function M.setup()
     buffers = {
       follow_current_file = {
         enabled = true,
-        leave_dirs_open = false,
+        leave_dirs_open = true,
       },
     },
 
