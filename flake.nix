@@ -27,6 +27,11 @@
       # inputs.dgop.follows = "dgop";
     };
 
+    dankGreeter = {
+      url = "github:AvengeMedia/dank-greeter";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     forgejo-mcp-src = {
       url = "git+https://codeberg.org/goern/forgejo-mcp";
       flake = false;
@@ -49,6 +54,7 @@
       mangowc,
       dgop,
       dankMaterialShell,
+      dankGreeter,
       forgejo-mcp-src,
       impermanence,
       sops-nix,

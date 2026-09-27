@@ -32,7 +32,7 @@ in
 
   imports = [
     inputs.mangowc.nixosModules.mango
-    inputs.dankMaterialShell.nixosModules.greeter
+    inputs.dankGreeter.nixosModules.default
   ];
 
   config = lib.mkIf cfg.enable {
@@ -135,7 +135,7 @@ in
       )
       ++ cfg.extraPackages;
 
-    programs.dank-material-shell.greeter = lib.mkIf cfg.enableGreeter {
+    programs.dms-greeter = lib.mkIf cfg.enableGreeter {
       enable = true;
       compositor.name = "mango";
       configHome = "/home/sebi";
