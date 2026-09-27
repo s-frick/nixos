@@ -164,6 +164,7 @@ in
       bind b set -g status
 
       bind G neww -n "git" -S lazygit
+      bind g display-popup -E -w 90% -h 90% -d "#{pane_current_path}" lazygit
       bind N neww -n "notes" -S "nvim ~/git/zettelkasten/log.md"
       bind C neww -n "configs" -S "nvim ~/git/configs/nixos/flake.nix"
       bind e neww -n "ranger" -S "ranger"
