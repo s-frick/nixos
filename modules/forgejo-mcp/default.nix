@@ -10,9 +10,12 @@ let
     version = "unstable";
     src = inputs.forgejo-mcp-src;
 
+    # Upstream vendor/ ist inkonsistent zu go.mod -> Module über den Proxy laden.
+    proxyVendor = true;
+
     # Nach dem ersten `nix build` schlägt dieser Hash fehl und zeigt den
     # korrekten Wert — diesen dann hier eintragen.
-    vendorHash = "sha256-QDJRbF4mZzBv1vxvo1ZQJaUJayRHj1jMgjaRfAmLMik=";
+    vendorHash = "sha256-92djjn0HVKPu5vn5FUJ1+FGhuyciKxVJdAC1xlEmRmA=";
 
     meta = {
       description = "MCP server for Forgejo – connects AI assistants to Forgejo repositories";
