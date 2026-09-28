@@ -53,7 +53,7 @@
         "type": "github"
       }
     },
-    "dankGreeter": {
+    "dankMaterialShell": {
       "inputs": {
         "dank-qml-common": "dank-qml-common_2",
         "flake-compat": "flake-compat",

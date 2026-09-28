@@ -55,7 +55,6 @@
       mangowc,
       dgop,
       dankMaterialShell,
-      dankGreeter,
       forgejo-mcp-src,
       impermanence,
       sops-nix,
