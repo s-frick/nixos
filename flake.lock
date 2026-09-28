@@ -1,5 +1,26 @@
 {
   "nodes": {
+    "dank-greeter": {
+      "inputs": {
+        "dank-qml-common": "dank-qml-common",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790189954,
+        "narHash": "sha256-ABpB7PW53cwhADKUMvVRrhdfpgy8m2DWH711F1oQZ20=",
+        "owner": "AvengeMedia",
+        "repo": "dank-greeter",
+        "rev": "1cd1193e1d423d21130ea8338d4c357093326b34",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AvengeMedia",
+        "repo": "dank-greeter",
+        "type": "github"
+      }
+    },
     "dank-qml-common": {
       "flake": false,
       "locked": {
@@ -33,27 +54,6 @@
       }
     },
     "dankGreeter": {
-      "inputs": {
-        "dank-qml-common": "dank-qml-common",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1790189954,
-        "narHash": "sha256-ABpB7PW53cwhADKUMvVRrhdfpgy8m2DWH711F1oQZ20=",
-        "owner": "AvengeMedia",
-        "repo": "dank-greeter",
-        "rev": "1cd1193e1d423d21130ea8338d4c357093326b34",
-        "type": "github"
-      },
-      "original": {
-        "owner": "AvengeMedia",
-        "repo": "dank-greeter",
-        "type": "github"
-      }
-    },
-    "dankMaterialShell": {
       "inputs": {
         "dank-qml-common": "dank-qml-common_2",
         "flake-compat": "flake-compat",
@@ -351,7 +351,7 @@
     },
     "root": {
       "inputs": {
-        "dankGreeter": "dankGreeter",
+        "dank-greeter": "dank-greeter",
         "dankMaterialShell": "dankMaterialShell",
         "dgop": "dgop",
         "forgejo-mcp-src": "forgejo-mcp-src",

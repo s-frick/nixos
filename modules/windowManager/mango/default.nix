@@ -32,7 +32,7 @@ in
 
   imports = [
     inputs.mangowc.nixosModules.mango
-    inputs.dankGreeter.nixosModules.default
+    inputs.dank-greeter.nixosModules.default
   ];
 
   config = lib.mkIf cfg.enable {

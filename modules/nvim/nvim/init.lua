@@ -129,6 +129,10 @@ require('lsp.rust_analyzer').setup({
   capabilities = capabilities,
   on_attach = keymap.on_attach,
 })
+require('lsp.clangd').setup({
+  capabilities = capabilities,
+  on_attach = keymap.on_attach,
+})
 
 -- Nix
 vim.lsp.config('nixd', {

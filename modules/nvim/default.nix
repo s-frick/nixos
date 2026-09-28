@@ -90,6 +90,7 @@ in
       cabal-install
       nixd
       rust-analyzer
+      clang-tools # clangd (fallback; project devshells bring their own)
       nixfmt
       ripgrep
       fd
@@ -217,6 +218,9 @@ in
 
           p.kotlin
           p.rust
+
+          p.c
+          p.cpp
 
         ]))
 
