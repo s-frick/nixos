@@ -27,4 +27,7 @@
   home-manager.users.sebi.imports = [
     ./home.nix
   ];
+  services.udev.packages = [ pkgs.openocd ];
+  users.groups.plugdev = { };
+  users.users.sebi.extraGroups = [ "plugdev" ]; # Fallback, falls uaccess nicht greift (z.B.
 }
