@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   input-overlay-presets = pkgs.fetchFromGitHub {
     owner = "univrsal";
@@ -13,24 +18,27 @@ in
     ../nvim
   ];
 
-  home.packages = with pkgs; [
-    tmux
-    fd
-    ripgrep
-    fzf
-    bat
-    eza
-    tree
+  home.packages =
+    with pkgs;
+    [
+      tmux
+      fd
+      ripgrep
+      fzf
+      bat
+      eza
+      tree
 
-    lazygit
-    httpyac
-    jq
-    yq
-    ranger
-  ] ++ lib.optionals config.my.rbw.enable [
-    rbw
-    pinentry-all
-  ];
+      lazygit
+      httpyac
+      jq
+      yq
+      ranger
+    ]
+    ++ lib.optionals config.my.rbw.enable [
+      rbw
+      pinentry-all
+    ];
 
   # programs.obs-studio = {
   #   enable = true;
@@ -165,6 +173,8 @@ in
 
       bind G neww -n "git" -S lazygit
       bind g display-popup -E -w 90% -h 90% -d "#{pane_current_path}" lazygit
+      bind t display-popup -E -w 90% -h 90% -d "#{pane_current_path}" zsh
+      bind j split-window -l 20% -fv -c "#{pane_current_path}"
       bind N neww -n "notes" -S "nvim ~/git/zettelkasten/log.md"
       bind C neww -n "configs" -S "nvim ~/git/configs/nixos/flake.nix"
       bind e neww -n "ranger" -S "ranger"
