@@ -27,6 +27,7 @@
 
   my.tmuxSessionizer.paths = [
     "~/git"
+    "~/git/exf"
   ];
 
   home.packages = with pkgs; [
