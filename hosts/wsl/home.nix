@@ -11,4 +11,9 @@
     enableZshIntegration = true;
     config.global.hide_env_diff = true;
   };
+  my.tmuxSessionizer.paths = [
+    "~/git"
+    "~/git/arena"
+    "~/git/tools"
+  ];
 }
