@@ -38,6 +38,17 @@ let
     };
     doCheck = false;
   };
+  mermaid-nvim = pkgs.vimUtils.buildVimPlugin {
+    pname = "mermaid.nvim";
+    version = "main";
+    src = pkgs.fetchFromGitHub {
+      owner = "kevalin";
+      repo = "mermaid.nvim";
+      rev = "4da12693b3b4d63b67d07bafe8340b4abc265c70";
+      sha256 = "sha256-SRg1V6fNlv+4Vrf1+mTNogIT/8X9DEl53+OhXm6crG8=";
+    };
+    doCheck = false;
+  };
   neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
     pname = "neotest-jdtls";
     version = "1.1.1";
@@ -222,6 +233,8 @@ in
           p.c
           p.cpp
 
+          p.mermaid
+
         ]))
 
         # UI/Navigation
@@ -243,6 +256,7 @@ in
       ])
       ++ [
         neotest-jdtls
+        mermaid-nvim
 
         # commonlisp
         vlime

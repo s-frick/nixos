@@ -74,6 +74,22 @@ require("completion").setup()
 -- Neo-tree
 require("neo_tree").setup()
 
+-- Mermaid (.mmd/.mermaid): Preview, Format, Lint via mmdc
+require("mermaid").setup()
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "mermaid",
+  callback = function(args)
+    local map = function(lhs, rhs, desc)
+      vim.keymap.set("n", lhs, rhs, { buffer = args.buf, desc = desc })
+    end
+    map("<leader>mp", "<cmd>MermaidPreview<CR>", "Mermaid Preview")
+    map("<leader>mx", "<cmd>MermaidPreviewStop<CR>", "Mermaid Stop Preview")
+    map("<leader>mf", "<cmd>MermaidFormat<CR>", "Mermaid Format")
+    map("<leader>mr", "<cmd>MermaidRender<CR>", "Mermaid Render")
+    map("<leader>mc", "<cmd>MermaidCopyURL<CR>", "Mermaid Copy URL")
+  end,
+})
+
 -- LSP
 -- vim.lsp.set_log_level("ERROR")
 -- vim.lsp.handlers["window/logMessage"] = function() end
