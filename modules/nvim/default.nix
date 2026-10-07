@@ -1,6 +1,5 @@
 {
   pkgs,
-  lib,
   config,
   ...
 }:
@@ -37,7 +36,6 @@ let
       rev = "v${version}";
       hash = "sha256-k8X2qtxUne8C6znYAKeb4zoBf+vffmcJZQHUmBvsilA=";
     };
-    cargoHash = "sha256-hnFHYQ8xPNFqic1UYygiLBWu3n82IkTJuQvgcXcMdv0=";
     cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
       inherit src;
       hash = "sha256-hnFHYQ8xPNFqic1UYygiLBWu3n82IkTJuQvgcXcMdv0=";
@@ -49,10 +47,9 @@ let
   });
 in
 {
-  home.packages = lib.mkAfter (
+  home.packages = (
     with pkgs;
     [
-      tmux
 
       openjdk25
       jdt-language-server
@@ -70,8 +67,6 @@ in
       rust-analyzer
       clang-tools # clangd (fallback; project devshells bring their own)
       nixfmt
-      ripgrep
-      fd
       stylua
       shellcheck
       shfmt
@@ -129,14 +124,11 @@ in
     viAlias = false;
     vimAlias = true;
 
-    # Falls du Node/Python-Provider für Plugins brauchst (Telescope, Treesitter, etc.)
-    withNodeJs = true;
     withPython3 = true;
-    withRuby = true;
+    withRuby = false;
 
     extraPackages = with pkgs; [
       tree-sitter-cli
-      (python3.withPackages (ps: [ ps.pynvim ]))
     ];
 
     plugins =
@@ -163,7 +155,6 @@ in
         friendly-snippets
         todo-comments-nvim
         markview-nvim
-        image-nvim
 
         nvim-dap-view
         nvim-dap-virtual-text
@@ -184,7 +175,6 @@ in
           p.html
           p.latex
           p.typst
-          p.yaml
 
           p.commonlisp
           p.typescript
@@ -206,9 +196,7 @@ in
         lualine-nvim
         gitsigns-nvim
         which-key-nvim
-        catppuccin-nvim
         gruber-darker-nvim
-        mini-icons
         nvim-web-devicons
         vim-tmux-navigator
 

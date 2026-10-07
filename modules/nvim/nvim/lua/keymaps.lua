@@ -1,14 +1,4 @@
 local M = {}
-local function has_server(list, name)
-  if not list then
-    return true
-  end
-  for _, n in ipairs(list) do
-    if n == name then
-      return true
-    end
-  end
-end
 
 local dap_ok, dap = pcall(require, "dap")
 if dap_ok then
@@ -150,7 +140,7 @@ end
 -- on_attach for LSP stuff
 function M.on_attach(client, bufnr)
   for _, m in ipairs(mappings) do
-    if m.scope == "lsp" and has_server(m.servers, client.name) then
+    if m.scope == "lsp" then
       vim.keymap.set(m.mode, m.lhs, m.rhs, { desc = m.desc, buffer = bufnr, silent = true, noremap = true })
     end
   end

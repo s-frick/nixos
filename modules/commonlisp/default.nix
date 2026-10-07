@@ -1,6 +1,6 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, config, ... }:
 {
-    home.packages = lib.mkAfter (with pkgs; [
+    home.packages = (with pkgs; [
       emacs
     ]);
 

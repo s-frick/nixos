@@ -2,11 +2,7 @@
 local M = {}
 
 function M.setup()
-  local ok, jdtls = pcall(require, "jdtls")
-  if not ok then
-    vim.notify("[jdtls] Plugin 'nvim-jdtls' nicht gefunden", vim.log.levels.ERROR)
-    return
-  end
+  local jdtls = require("jdtls")
 
   local bufnr = vim.api.nvim_get_current_buf()
   local fname = vim.api.nvim_buf_get_name(bufnr)
@@ -78,16 +74,7 @@ function M.setup()
     )
   end
 
-  -- Executable für jdtls herausfinden (jdtls oder jdt-language-server)
-  local cmd
-  if vim.fn.executable("jdtls") == 1 then
-    cmd = { "jdtls", "-data", workspace_dir }
-  elseif vim.fn.executable("jdt-language-server") == 1 then
-    cmd = { "jdt-language-server", "-data", workspace_dir }
-  else
-    vim.notify("[jdtls] Kein 'jdtls' oder 'jdt-language-server' im PATH gefunden", vim.log.levels.ERROR)
-    return
-  end
+  local cmd = { "jdtls", "-data", workspace_dir }
 
   local lombok_jar = os.getenv("LOMBOK_JAR")
   if lombok_jar and lombok_jar ~= "" then
@@ -95,15 +82,11 @@ function M.setup()
   end
   table.insert(cmd, "--jvm-arg=-Xmx8g")
 
-  local keymaps = require("keymaps")
-
   -- capabilities für LSP von nvim-cmp holen
   local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-  local function on_attach(client, bufnr)
-    -- Standard-LSP-Keymaps (konsistent mit allen anderen Sprachen)
-    keymaps.on_attach(client, bufnr)
-
+  -- Standard-LSP-Keymaps setzt der LspAttach-Autocmd in init.lua
+  local function on_attach(_, bufnr)
     -- Java-spezifische Keymaps
     local opts = { noremap = true, silent = true, buffer = bufnr }
     vim.keymap.set("n", "<leader>cc", "<cmd>JdtCompile<CR>", opts)

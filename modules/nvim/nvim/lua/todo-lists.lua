@@ -39,7 +39,6 @@ local function _todo_next(inc)
   local line = vim.api.nvim_get_current_line()
   line = line:gsub("%- %[(.)%]", function(mark)
     local next = index_of(marks, mark) + inc
-    local next = index_of(marks, mark) + inc
 
     if next < 1 then
       next = #marks
@@ -55,10 +54,6 @@ local function todo_next() _todo_next(1) end
 local function todo_prev() _todo_next(-1) end
 
 function M.setup()
-  if _initialized then return end
-  _initialized = true
-
-
   vim.api.nvim_create_user_command("TodoToggle", todo_toggle, {})
   vim.api.nvim_create_user_command("TodoNext", todo_next, {})
   vim.api.nvim_create_user_command("TodoPrev", todo_prev, {})

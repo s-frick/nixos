@@ -12,6 +12,8 @@ Die Nummern (Nr) entsprechen der ursprünglichen Rangliste, damit Aufträge wie 
 - **Mittel**: 10–50 Zeilen oder doppelt ausgeführte Logik
 - **Niedrig**: unter 10 Zeilen, kosmetisch
 
+**Status**: ✅ erledigt
+
 **Tags**: `delete` toter Code · `native` Plattform kann es schon · `reuse` existiert bereits im Repo · `yagni` Option/Abstraktion ohne Nutzer · `shrink` gleiche Logik, kürzer
 
 | Modul | Befunde | Zeilen (≈) | Deps |
@@ -32,29 +34,29 @@ Drei tote Teilbäume (Java-Test-Helfer, neotest, LSP-Wrapper) machen allein rund
 
 | Nr | Tag | Befund | Ersatz | Ort | Zeilen (≈) |
 | --- | --- | --- | --- | --- | --- |
-| 1 | delete | `test_all_test_classes`, `test_current_package`, `find_all_test_files`: kein Aufrufer, kein Keymap, kein Command | nichts | `lua/jdtls_setup.lua:212-321` | −110 |
-| 2 | native | Sechs `lua/lsp/*.lua`-Wrapper rufen nur `vim.lsp.config` + `enable`; sechs gleiche `setup{capabilities, on_attach}`-Aufrufe | Tabellen nach `nvim/lsp/<name>.lua` (Neovim 0.11 lädt sie selbst), einmal `vim.lsp.config('*', {capabilities})`, einmal `vim.lsp.enable{...}`; `cmd`/`filetypes`/`root_markers` streichen, wo sie lspconfig-Defaults wiederholen; ungenutztes `util`-require und ignoriertes `single_file_support` raus | `lua/lsp/*`, `init.lua:126-158` | −100 |
-| 3 | delete | neotest-Stack nie geladen: `java_neotest.lua`, `neotest-jdtls`-Derivation, zwei auskommentierte Derivationen, Plugins `neotest`, `nvim-nio`, `FixCursorHold-nvim` (seit nvim 0.8 überflüssig) | nichts; jdtls belegt `<leader>tn`/`tN` schon | `default.nix:10-64,205-207,258`, `lua/java_neotest.lua` | −70 |
+| ✅ 1 | delete | `test_all_test_classes`, `test_current_package`, `find_all_test_files`: kein Aufrufer, kein Keymap, kein Command | nichts | `lua/jdtls_setup.lua:212-321` | −110 |
+| ✅ 2 | native | Sechs `lua/lsp/*.lua`-Wrapper rufen nur `vim.lsp.config` + `enable`; sechs gleiche `setup{capabilities, on_attach}`-Aufrufe | Tabellen nach `nvim/lsp/<name>.lua` (Neovim 0.11 lädt sie selbst), einmal `vim.lsp.config('*', {capabilities})`, einmal `vim.lsp.enable{...}`; `cmd`/`filetypes`/`root_markers` streichen, wo sie lspconfig-Defaults wiederholen; ungenutztes `util`-require und ignoriertes `single_file_support` raus | `lua/lsp/*`, `init.lua:126-158` | −100 |
+| ✅ 3 | delete | neotest-Stack nie geladen: `java_neotest.lua`, `neotest-jdtls`-Derivation, zwei auskommentierte Derivationen, Plugins `neotest`, `nvim-nio`, `FixCursorHold-nvim` (seit nvim 0.8 überflüssig) | nichts; jdtls belegt `<leader>tn`/`tN` schon | `default.nix:10-64,205-207,258`, `lua/java_neotest.lua` | −70 |
 
 ### Mittel
 
 | Nr | Tag | Befund | Ersatz | Ort | Zeilen (≈) |
 | --- | --- | --- | --- | --- | --- |
-| 4 | shrink | nvim-dap-virtual-text-Setup wiederholt alle Defaults | `require("nvim-dap-virtual-text").setup{ virt_text_pos = 'eol' }` | `lua/dap_ui_widgets.lua:22-57` | −33 |
-| 5 | delete | `image_nvim.lua` nie required, Plugin `image-nvim` nie eingerichtet | nichts | `lua/image_nvim.lua`, `default.nix:199` | −31 |
-| 16 | shrink | jdtls-Guards: `pcall(require,"jdtls")` (Nix installiert es immer), Fallback auf `jdt-language-server` (Paket liefert `jdtls`), `missing`-Buchführung | `local cmd = { "jdtls", "-data", workspace_dir }` | `lua/jdtls_setup.lua:5-9,47-90` | −20 |
-| 10 | delete | `on_attach` in jeder Server-Config und in jdtls, obwohl `LspAttach` schon `keymap.on_attach` für jeden Client aufruft: Keymaps werden doppelt gesetzt | nur der Autocmd; jdtls behält nur Java-Maps | `init.lua:128-157`, `lua/jdtls_setup.lua:105` | −15 |
-| 11 | delete | `has_server` + `m.servers`-Prüfung: kein Mapping hat ein `servers`-Feld | `if m.scope == "lsp"` | `lua/keymaps.lua:2-11,153` | −12 |
+| ✅ 4 | shrink | nvim-dap-virtual-text-Setup wiederholt alle Defaults | `require("nvim-dap-virtual-text").setup{ virt_text_pos = 'eol' }` | `lua/dap_ui_widgets.lua:22-57` | −33 |
+| ✅ 5 | delete | `image_nvim.lua` nie required, Plugin `image-nvim` nie eingerichtet | nichts | `lua/image_nvim.lua`, `default.nix:199` | −31 |
+| ✅ 16 | shrink | jdtls-Guards: `pcall(require,"jdtls")` (Nix installiert es immer), Fallback auf `jdt-language-server` (Paket liefert `jdtls`), `missing`-Buchführung (Env-Var-Guard bewusst behalten: verhindert Abbruch in veralteter Shell) | `local cmd = { "jdtls", "-data", workspace_dir }` | `lua/jdtls_setup.lua:5-9,47-90` | −20 |
+| ✅ 10 | delete | `on_attach` in jeder Server-Config und in jdtls, obwohl `LspAttach` schon `keymap.on_attach` für jeden Client aufruft: Keymaps werden doppelt gesetzt | nur der Autocmd; jdtls behält nur Java-Maps | `init.lua:128-157`, `lua/jdtls_setup.lua:105` | −15 |
+| ✅ 11 | delete | `has_server` + `m.servers`-Prüfung: kein Mapping hat ein `servers`-Feld | `if m.scope == "lsp"` | `lua/keymaps.lua:2-11,153` | −12 |
 
 ### Niedrig
 
 | Nr | Tag | Befund | Ersatz | Ort | Zeilen (≈) |
 | --- | --- | --- | --- | --- | --- |
-| 18 | delete | tmux, ripgrep, fd doppelt (home-common hat sie); `lib.mkAfter` unnötig, Listen werden ohnehin gemerged (auch in commonlisp) | nichts | `default.nix:88-111`, `modules/commonlisp/default.nix:3` | −4 |
-| 17 | delete | `withNodeJs = true` (init.lua schaltet Node-Provider ab), `withRuby`, `python3.withPackages pynvim` (`withPython3` liefert es) | nichts | `default.nix:167-176` | −3 |
-| 23 | shrink | doppelte `local next`-Zeile, globaler `_initialized`-Guard | Zeile und Guard streichen | `lua/todo-lists.lua:42-43,58-59` | −3 |
-| 20 | delete | Plugins `catppuccin-nvim` und `mini-icons` ungenutzt (gruber-darker und devicons aktiv) | nichts | `default.nix:249,251` | −2 |
-| 22a | delete | `p.yaml` doppelt in Treesitter-Liste; `cargoHash` wirkungslos, weil `cargoDeps` überschrieben | nichts | `default.nix:227,76` | −2 |
+| ✅ 18 | delete | tmux, ripgrep, fd doppelt (home-common hat sie); `lib.mkAfter` unnötig, Listen werden ohnehin gemerged (auch in commonlisp) | nichts | `default.nix:88-111`, `modules/commonlisp/default.nix:3` | −4 |
+| ✅ 17 | delete | `withNodeJs = true` (init.lua schaltet Node-Provider ab), `withRuby`, `python3.withPackages pynvim` (`withPython3` liefert es) | nichts | `default.nix:167-176` | −3 |
+| ✅ 23 | shrink | doppelte `local next`-Zeile, globaler `_initialized`-Guard | Zeile und Guard streichen | `lua/todo-lists.lua:42-43,58-59` | −3 |
+| ✅ 20 | delete | Plugins `catppuccin-nvim` und `mini-icons` ungenutzt (gruber-darker und devicons aktiv) | nichts | `default.nix:249,251` | −2 |
+| ✅ 22a | delete | `p.yaml` doppelt in Treesitter-Liste; `cargoHash` wirkungslos, weil `cargoDeps` überschrieben | nichts | `default.nix:227,76` | −2 |
 
 ## Desktop / Mango (`modules/windowManager/mango`)
 
