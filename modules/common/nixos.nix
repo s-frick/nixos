@@ -7,12 +7,6 @@
 }:
 
 {
-  # Beispiel: Overlays aus deinen Inputs (falls sie welche exposen)
-  # nixpkgs.overlays = [
-  #   inputs.mangowc.overlays.default
-  #   inputs.dankMaterialShell.overlays.default
-  # ];
-
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {

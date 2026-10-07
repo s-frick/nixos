@@ -9,7 +9,7 @@ let
   hooksDir = "${caveman-src}/src/hooks";
   claudeDir = "${config.home.homeDirectory}/.claude";
   jq = lib.getExe pkgs.jq;
-  node = lib.getExe pkgs.nodejs;
+  addHook = import ../claude-hooks.nix { inherit pkgs lib; } "${claudeDir}/hooks";
 in
 {
   home.file = {
@@ -31,15 +31,8 @@ in
       echo '{}' > "$settings"
     fi
 
-    if ! ${jq} -e '[.hooks.SessionStart // [] | .[].hooks[]?.command // ""] | any(contains("caveman-activate"))' "$settings" > /dev/null 2>&1; then
-      tmp=$(mktemp)
-      ${jq} '.hooks.SessionStart //= [] | .hooks.SessionStart += [{"hooks": [{"type": "command", "command": "${node} \"${claudeDir}/hooks/caveman-activate.js\"", "timeout": 5}]}]' "$settings" > "$tmp" && mv "$tmp" "$settings"
-    fi
-
-    if ! ${jq} -e '[.hooks.UserPromptSubmit // [] | .[].hooks[]?.command // ""] | any(contains("caveman-mode-tracker"))' "$settings" > /dev/null 2>&1; then
-      tmp=$(mktemp)
-      ${jq} '.hooks.UserPromptSubmit //= [] | .hooks.UserPromptSubmit += [{"hooks": [{"type": "command", "command": "${node} \"${claudeDir}/hooks/caveman-mode-tracker.js\"", "timeout": 5}]}]' "$settings" > "$tmp" && mv "$tmp" "$settings"
-    fi
+    ${addHook "SessionStart" "caveman-activate.js"}
+    ${addHook "UserPromptSubmit" "caveman-mode-tracker.js"}
 
     if ! ${jq} -e 'has("statusLine")' "$settings" > /dev/null 2>&1; then
       tmp=$(mktemp)

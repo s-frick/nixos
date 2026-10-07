@@ -85,9 +85,9 @@ Drei tote Teilbäume (Java-Test-Helfer, neotest, LSP-Wrapper) machen allein rund
 
 | Nr | Tag | Befund | Ersatz | Ort | Zeilen (≈) |
 | --- | --- | --- | --- | --- | --- |
-| 19 | delete | `users.users.sebi.isNormalUser` in drei Hosts (steht schon in nixos.nix); `../../modules/common` in silverback und wsl erneut importiert (flake.nix fügt es schon hinzu) | nichts | `hosts/*/configuration.nix` | −9 |
-| 14 | delete | Flake-Input `dgop`; einzige Nutzung (`follows`) auskommentiert | nichts | `flake.nix:19-22,27,56` | −6 |
-| 22b | delete | Leeres `home.packages = [ ]` in fuji und wsl | nichts | `hosts/{fuji,wsl}/home.nix` | −5 |
+| ✅ 19 | delete | `users.users.sebi.isNormalUser` in drei Hosts (steht schon in nixos.nix); `../../modules/common` in silverback und wsl erneut importiert (flake.nix fügt es schon hinzu) | nichts | `hosts/*/configuration.nix` | −9 |
+| ✅ 14 | delete | Flake-Input `dgop`; einzige Nutzung (`follows`) auskommentiert | nichts | `flake.nix:19-22,27,56` | −6 |
+| ✅ 22b | delete | Leeres `home.packages = [ ]` in fuji und wsl | nichts | `hosts/{fuji,wsl}/home.nix` | −5 |
 
 ## Home-Manager Common (`modules/common`)
 
@@ -95,15 +95,15 @@ Drei tote Teilbäume (Java-Test-Helfer, neotest, LSP-Wrapper) machen allein rund
 
 | Nr | Tag | Befund | Ersatz | Ort | Zeilen (≈) |
 | --- | --- | --- | --- | --- | --- |
-| 8 | delete | `input-overlay-presets`-Fetch und auskommentierter OBS-Block | nichts | `home-common.nix:7-14,43-61` | −20 |
+| ✅ 8 | delete | `input-overlay-presets`-Fetch und auskommentierter OBS-Block | nichts | `home-common.nix:7-14,43-61` | −20 |
 
 ### Niedrig
 
 | Nr | Tag | Befund | Ersatz | Ort | Zeilen (≈) |
 | --- | --- | --- | --- | --- | --- |
-| 12 | yagni | Default-Liste von `my.tmuxSessionizer.paths`; alle vier Hosts überschreiben sie | `default = [ ];` | `home-options.nix:13-22` | −9 |
-| 22c | delete | Auskommentierte Overlays | nichts | `nixos.nix:10-14` | −5 |
-| 21 | delete | tmux-`extraConfig` wiederholt `set -g base-index 1` und `set -g mode-keys vi` (`baseIndex`/`keyMode`) | nichts | `home-common.nix:155,157` | −2 |
+| ✅ 12 | yagni | Default-Liste von `my.tmuxSessionizer.paths`; alle vier Hosts überschreiben sie | `default = [ ];` | `home-options.nix:13-22` | −9 |
+| ✅ 22c | delete | Auskommentierte Overlays | nichts | `nixos.nix:10-14` | −5 |
+| ✅ 21 | delete | tmux-`extraConfig` wiederholt `set -g base-index 1` und `set -g mode-keys vi` (`baseIndex`/`keyMode`) | nichts | `home-common.nix:155,157` | −2 |
 
 ## Claude-Module (`modules/claude-caveman`, `modules/claude-ponytail`)
 
@@ -111,4 +111,4 @@ Drei tote Teilbäume (Java-Test-Helfer, neotest, LSP-Wrapper) machen allein rund
 
 | Nr | Tag | Befund | Ersatz | Ort | Zeilen (≈) |
 | --- | --- | --- | --- | --- | --- |
-| 13 | reuse | caveman baut den jq-Hook-Check zweimal inline; ponytail hat dafür schon `addHook event script` | gemeinsamen Helper (z. B. `modules/claude-hooks.nix`) in beiden nutzen | `modules/claude-caveman/default.nix:34-42` | −6 |
+| ✅ 13 | reuse | caveman baut den jq-Hook-Check zweimal inline; ponytail hat dafür schon `addHook event script` | gemeinsamen Helper (z. B. `modules/claude-hooks.nix`) in beiden nutzen | `modules/claude-caveman/default.nix:34-42` | −6 |

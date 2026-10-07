@@ -4,14 +4,6 @@
   lib,
   ...
 }:
-let
-  input-overlay-presets = pkgs.fetchFromGitHub {
-    owner = "univrsal";
-    repo = "input-overlay";
-    rev = "5.0.6";
-    hash = "sha256-Y3GotIyljrDuEHcr1JTHMNgMPH2QmzWNvb+xTBmYVj8=";
-  };
-in
 {
   imports = [
     ./home-options.nix
@@ -39,26 +31,6 @@ in
       rbw
       pinentry-all
     ];
-
-  # programs.obs-studio = {
-  #   enable = true;
-  #
-  #   plugins = with pkgs.obs-studio-plugins; [
-  #     input-overlay
-  #     wlrobs # Wayland Screen Capture (wlroots)
-  #     obs-pipewire-audio-capture
-  #   ];
-  # };
-
-  # home.file.".local/bin/obs-x11" = {
-  #   executable = true;
-  #   text = ''
-  #     #!${pkgs.bash}/bin/bash
-  #     QT_QPA_PLATFORM=xcb exec obs "$@"
-  #   '';
-  # };
-  #
-  # xdg.configFile."obs-input-overlay/presets".source = "${input-overlay-presets}/presets";
 
   programs.zsh = {
     enable = true;
@@ -159,9 +131,7 @@ in
       set-option -g prefix C-Space
       bind-key C-Space send-prefix
 
-      set -g base-index 1
       set -g renumber-windows on
-      set -g mode-keys vi
       set -g status-position top
       set -g status-justify absolute-centre
       set -g status-style "bg=colour233 fg=colour250"

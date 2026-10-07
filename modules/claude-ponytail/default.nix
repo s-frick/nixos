@@ -10,13 +10,7 @@ let
   claudeDir = "${config.home.homeDirectory}/.claude";
   hooksDir = "${claudeDir}/ponytail/hooks";
   jq = lib.getExe pkgs.jq;
-  node = lib.getExe pkgs.nodejs;
-  addHook = event: script: ''
-    if ! ${jq} -e '[.hooks.${event} // [] | .[].hooks[]?.command // ""] | any(contains("${script}"))' "$settings" > /dev/null 2>&1; then
-      tmp=$(mktemp)
-      ${jq} '.hooks.${event} //= [] | .hooks.${event} += [{"hooks": [{"type": "command", "command": "${node} \"${hooksDir}/${script}\"", "timeout": 5}]}]' "$settings" > "$tmp" && mv "$tmp" "$settings"
-    fi
-  '';
+  addHook = import ../claude-hooks.nix { inherit pkgs lib; } hooksDir;
 in
 {
   # Hooks lesen ../skills/ponytail/SKILL.md relativ zu sich selbst, daher ganzes Repo verlinken

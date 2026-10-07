@@ -1,7 +1,6 @@
 { pkgs, ... }:
 {
   imports = [
-    ../../modules/common
     ../../modules/oom
     ./impermanence.nix
     ./sops.nix
@@ -14,7 +13,6 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  users.users.sebi.isNormalUser = true;
 
   programs.nix-ld.enable = true;
 

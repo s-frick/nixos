@@ -6,7 +6,6 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  users.users.sebi.isNormalUser = true;
 
   # NixOS-spezifisch für fuji
   networking.hostName = "fuji";

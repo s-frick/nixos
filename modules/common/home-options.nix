@@ -10,16 +10,7 @@
 
     tmuxSessionizer.paths = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [
-        "~/git/work"
-        "~/git/private"
-        "~/git/old/probes"
-        "~/git/old/private"
-        "~/git/old/learning"
-        "~/git/monkey"
-        "~/git/foss"
-        "~/git/learning"
-      ];
+      default = [ ];
       description = "Directories tmux-sessionizer searches for projects (one level deep).";
     };
   };

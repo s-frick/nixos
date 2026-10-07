@@ -76,26 +76,6 @@
         "type": "github"
       }
     },
-    "dgop": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1789922039,
-        "narHash": "sha256-nCmCj0tBJvxwUIA4aJskbnYCpqJ8ONVj1RS4e08jr+Q=",
-        "owner": "AvengeMedia",
-        "repo": "dgop",
-        "rev": "59c7d81ae3b95a27b9ed76d7984eefc14232677d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "AvengeMedia",
-        "repo": "dgop",
-        "type": "github"
-      }
-    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -353,7 +333,6 @@
       "inputs": {
         "dank-greeter": "dank-greeter",
         "dankMaterialShell": "dankMaterialShell",
-        "dgop": "dgop",
         "forgejo-mcp-src": "forgejo-mcp-src",
         "home-manager": "home-manager",
         "impermanence": "impermanence",
