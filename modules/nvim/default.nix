@@ -7,26 +7,6 @@
 let
   haskellToolchain = pkgs.haskell.packages.ghc96;
 
-  # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
-  #   pname = "neotest-jdtls";
-  #   version = "dev";
-  #   src = /home/sebi/git/configs/neotest-jdtls;
-  #   doCheck = false;
-  # };
-  # neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
-  #   pname = "neotest-jdtls";
-  #   version = "dev";
-  #   src = pkgs.fetchFromGitHub {
-  #     owner = "s-frick";
-  #     repo  = "neotest-jdtls";
-  #     rev   = "c6659f2fadfef7b3547ea023d8c1464bfe5eb168";
-  #     sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
-  #     # beim ersten Build wird Nix dir den richtigen Hash sagen;
-  #     # den dann hier eintragen.
-  #   };
-  #   doCheck = false;
-  # };
-
   vlime = pkgs.vimUtils.buildVimPlugin {
     pname = "vlime";
     version = "main";
@@ -46,19 +26,6 @@ let
       repo = "mermaid.nvim";
       rev = "4da12693b3b4d63b67d07bafe8340b4abc265c70";
       sha256 = "sha256-SRg1V6fNlv+4Vrf1+mTNogIT/8X9DEl53+OhXm6crG8=";
-    };
-    doCheck = false;
-  };
-  neotest-jdtls = pkgs.vimUtils.buildVimPlugin {
-    pname = "neotest-jdtls";
-    version = "1.1.1";
-    src = pkgs.fetchFromGitHub {
-      owner = "atm1020";
-      repo = "neotest-jdtls";
-      rev = "v1.1.1"; # Tag von GitHub
-      sha256 = "sha256-vKGFaLz4G9x1u0x5MlIVzCS0owdz4W+TMfkBOtWZMew=";
-      # beim ersten Build wird Nix dir den richtigen Hash sagen;
-      # den dann hier eintragen.
     };
     doCheck = false;
   };
@@ -201,10 +168,6 @@ in
         nvim-dap-view
         nvim-dap-virtual-text
 
-        # Neotest + Dependencies
-        neotest
-        nvim-nio
-        FixCursorHold-nvim
 
         # Syntax/Parsing
         (nvim-treesitter.withPlugins (p: [
@@ -255,7 +218,6 @@ in
 
       ])
       ++ [
-        neotest-jdtls
         mermaid-nvim
 
         # commonlisp

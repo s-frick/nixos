@@ -123,39 +123,9 @@ vim.diagnostic.config({
   underline = true,
 })
 
-local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
-require('lsp.lua_ls').setup({
-  capabilities = capabilities,
-  on_attach = keymap.on_attach,
-})
-require('lsp.hls').setup({
-  capabilities = capabilities,
-  on_attach = keymap.on_attach,
-})
-require('lsp.ts_ls').setup({
-  capabilities = capabilities,
-  on_attach = keymap.on_attach,
-})
-require('lsp.kotlin_language_server').setup({
-  capabilities = capabilities,
-  on_attach = keymap.on_attach,
-})
-require('lsp.rust_analyzer').setup({
-  capabilities = capabilities,
-  on_attach = keymap.on_attach,
-})
-require('lsp.clangd').setup({
-  capabilities = capabilities,
-  on_attach = keymap.on_attach,
-})
-
--- Nix
-vim.lsp.config('nixd', {
-  capabilities = capabilities,
-  on_attach = keymap.on_attach,
-})
-vim.lsp.enable('nixd')
+-- Server-Overrides liegen in after/lsp/<name>.lua (after/, damit sie nvim-lspconfig schlagen)
+vim.lsp.config('*', { capabilities = require("cmp_nvim_lsp").default_capabilities() })
+vim.lsp.enable({ 'lua_ls', 'hls', 'ts_ls', 'kotlin_language_server', 'rust_analyzer', 'clangd', 'nixd' })
 
 
 vim.api.nvim_create_autocmd("LspAttach", {
