@@ -39,12 +39,20 @@
     htop
     btop
     gnumake
+    podman-compose
 
     sops
     ssh-to-age
     age
     just
   ];
+
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    dockerSocket.enable = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
 
   nix.settings = {
     experimental-features = [

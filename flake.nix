@@ -47,54 +47,24 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      nixos-wsl,
-      home-manager,
-      mangowc,
-      dgop,
-      dankMaterialShell,
-      forgejo-mcp-src,
-      impermanence,
-      sops-nix,
-      ...
-    }@inputs:
+    { self, nixpkgs, nixos-wsl, home-manager, ... }@inputs:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      mkHost = name: extra: nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs; };
+        modules = extra ++ [
+          ./hosts/${name}/configuration.nix
+          ./modules/common
+        ];
+      };
     in
     {
       nixosConfigurations = {
-        fuji = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
-          system = system;
-          modules = [
-            ./hosts/fuji/hardware.nix
-            ./hosts/fuji/configuration.nix
-            ./modules/common
-          ];
-        };
-
-        silverback = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
-          system = system;
-          modules = [
-            ./hosts/silverback/hardware.nix
-            ./hosts/silverback/configuration.nix
-            ./modules/common
-          ];
-        };
-
-        wsl = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
-          system = system;
-          modules = [
-            nixos-wsl.nixosModules.default
-            ./hosts/wsl/configuration.nix
-            ./modules/common
-          ];
-        };
+        fuji = mkHost "fuji" [ ./hosts/fuji/hardware.nix ];
+        silverback = mkHost "silverback" [ ./hosts/silverback/hardware.nix ];
+        wsl = mkHost "wsl" [ nixos-wsl.nixosModules.default ];
       };
       # Standalone Home-Manager (Nix Package Manager auf Ubuntu/WSL, kein NixOS)
       homeConfigurations."sebi@ubuntu" = home-manager.lib.homeManagerConfiguration {

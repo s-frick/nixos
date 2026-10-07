@@ -64,13 +64,13 @@ Drei tote Teilbäume (Java-Test-Helfer, neotest, LSP-Wrapper) machen allein rund
 
 | Nr | Tag | Befund | Ersatz | Ort | Zeilen (≈) |
 | --- | --- | --- | --- | --- | --- |
-| 6 | delete | Doppelte systemPackages: git, vim, gnumake (nixos.nix), tmux, tree, lazygit (home-common), xdg-desktop-portal* (`xdg.portal`), pipewire, wireplumber (`services.pipewire`), coreutils-full; vermutlich auch `dmsPackages`, weil das HM-Modul `dank-material-shell` dms ohnehin installiert | nichts | `default.nix:95-135` | −12 |
+| ✅ 6 | delete | Doppelte systemPackages: git, vim, gnumake (nixos.nix), tmux, tree, lazygit (home-common), xdg-desktop-portal* (`xdg.portal`), pipewire, wireplumber (`services.pipewire`), coreutils-full; vermutlich auch `dmsPackages`, weil das HM-Modul `dank-material-shell` dms ohnehin installiert | nichts | `default.nix:95-135` | −12 |
 
 ### Niedrig
 
 | Nr | Tag | Befund | Ersatz | Ort | Zeilen (≈) |
 | --- | --- | --- | --- | --- | --- |
-| 15 | yagni | Option `extraPackages`, kein Host setzt sie | nichts | `default.nix:22-26,136` | −6 |
+| ✅ 15 | yagni | Option `extraPackages`, kein Host setzt sie | nichts | `default.nix:22-26,136` | −6 |
 
 ## Flake & Hosts (`flake.nix`, `hosts/*`)
 
@@ -78,8 +78,8 @@ Drei tote Teilbäume (Java-Test-Helfer, neotest, LSP-Wrapper) machen allein rund
 
 | Nr | Tag | Befund | Ersatz | Ort | Zeilen (≈) |
 | --- | --- | --- | --- | --- | --- |
-| 7 | shrink | Drei gleich aufgebaute `nixosSystem`-Blöcke; ungenutzte destrukturierte Args (mangowc, dgop, dankMaterialShell, forgejo-mcp-src, impermanence, sops-nix) | `mkHost = name: extra: nixpkgs.lib.nixosSystem { specialArgs = { inherit inputs; }; modules = extra ++ [ ./hosts/${name}/configuration.nix ./modules/common ]; };` und `{ self, nixpkgs, nixos-wsl, home-manager, ... }@inputs` | `flake.nix:49-98` | −29 |
-| 9 | reuse | direnv-Block in drei Hosts kopiert, podman-Block in drei Hosts kopiert | direnv nach `home-common.nix`, podman nach `nixos.nix` oder in ein gemeinsames Modul | `hosts/{fuji,wsl,ubuntu}/home.nix`, `hosts/{fuji,silverback,wsl}/configuration.nix` | −24 |
+| ✅ 7 | shrink | Drei gleich aufgebaute `nixosSystem`-Blöcke; ungenutzte destrukturierte Args (mangowc, dgop, dankMaterialShell, forgejo-mcp-src, impermanence, sops-nix) | `mkHost = name: extra: nixpkgs.lib.nixosSystem { specialArgs = { inherit inputs; }; modules = extra ++ [ ./hosts/${name}/configuration.nix ./modules/common ]; };` und `{ self, nixpkgs, nixos-wsl, home-manager, ... }@inputs` | `flake.nix:49-98` | −29 |
+| ✅ 9 | reuse | direnv-Block in drei Hosts kopiert, podman-Block in drei Hosts kopiert | direnv nach `home-common.nix`, podman nach `nixos.nix` oder in ein gemeinsames Modul | `hosts/{fuji,wsl,ubuntu}/home.nix`, `hosts/{fuji,silverback,wsl}/configuration.nix` | −24 |
 
 ### Niedrig
 

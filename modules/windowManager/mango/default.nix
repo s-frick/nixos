@@ -19,13 +19,6 @@ in
 {
   options.desktop.mango = {
     enable = lib.mkEnableOption "MangoWC (mango) compositor with NixOS + Home-Manager";
-    extraPackages = lib.mkOption {
-      type = lib.types.listOf lib.types.package;
-      default = [ ];
-      description = "Additional packages for the mango desktop";
-    };
-
-    enableDms = lib.mkEnableOption "Enable DankMaterialShell / dms";
 
     enableGreeter = lib.mkEnableOption "Enable the DankMaterialShell greeter (greetd-based login manager)";
   };
@@ -92,48 +85,27 @@ in
 
     programs.mango.enable = true;
 
-    environment.systemPackages =
-      (with pkgs; [
-        adwaita-qt
-        adwaita-icon-theme
-        quickshell
-        foot
-        sox
-        wlr-randr
-        pipewire
-        wireplumber
-        xdg-desktop-portal
-        xdg-desktop-portal-gtk
-        xdg-desktop-portal-wlr
-        grim
-        slurp
-        screenshotRegion
+    environment.systemPackages = with pkgs; [
+      adwaita-qt
+      adwaita-icon-theme
+      quickshell
+      foot
+      sox
+      wlr-randr
+      grim
+      slurp
+      screenshotRegion
 
-        coreutils-full
-        gnumake
-        tree
-        git
-        lazygit
-        tmux
-        vim
-        wget
-        kitty
-        brave
+      wget
+      kitty
+      brave
 
-        # Audio/video
-        pavucontrol
-        playerctl
+      # Audio/video
+      pavucontrol
+      playerctl
 
-        matugen
-      ])
-      ++ lib.optionals cfg.enableDms (
-        let
-          dmsPackages = inputs.dankMaterialShell.packages.${pkgs.stdenv.hostPlatform.system}.default;
-        in [
-          dmsPackages
-        ]
-      )
-      ++ cfg.extraPackages;
+      matugen
+    ];
 
     programs.dms-greeter = lib.mkIf cfg.enableGreeter {
       enable = true;

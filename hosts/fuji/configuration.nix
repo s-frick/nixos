@@ -15,13 +15,7 @@
   # fuji-spezifische Systempakete
   environment.systemPackages = with pkgs; [
     gimp3
-    podman-compose
   ];
-
-  virtualisation.podman.enable = true;
-  virtualisation.podman.dockerCompat = true;
-  virtualisation.podman.dockerSocket.enable = true;
-  virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
 
   # fuji-spezifische Home-Manager-Erweiterungen für sebi
   home-manager.users.sebi.imports = [
