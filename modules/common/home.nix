@@ -13,7 +13,7 @@
         ./home-common.nix
         ../forgejo-mcp
         ../claude-caveman
-        ../rtk
+        ../claude-ponytail
       ];
 
       # NixOS-only extras (kein Bestandteil des portablen Kerns)
