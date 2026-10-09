@@ -20,6 +20,7 @@
   my.rbw.enable = false;
 
   my.nvim.copilot.enable = true;
+  my.graft.enable = true;
 
   my.tmuxSessionizer.paths = [
     "~/git"

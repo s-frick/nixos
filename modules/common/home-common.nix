@@ -8,6 +8,7 @@
   imports = [
     ./home-options.nix
     ../nvim
+    ../graft
   ];
 
   home.packages =

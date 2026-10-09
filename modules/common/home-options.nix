@@ -14,6 +14,12 @@
       description = "Add GitHub Copilot (copilot.vim) to neovim.";
     };
 
+    graft.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Install graft (codebase context graph CLI for coding agents).";
+    };
+
     tmuxSessionizer.paths = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
