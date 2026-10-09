@@ -8,6 +8,12 @@
       description = "Install rbw (Bitwarden CLI) plus the rbw-fzf picker and its ^p binding.";
     };
 
+    nvim.copilot.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Add GitHub Copilot (copilot.vim) to neovim.";
+    };
+
     tmuxSessionizer.paths = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];

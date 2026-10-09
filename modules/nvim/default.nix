@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   config,
   ...
 }:
@@ -106,6 +107,7 @@ in
       sbcl
       rlwrap
     ]
+    ++ lib.optionals config.my.nvim.copilot.enable [ github-copilot-cli ]
   );
 
   home.sessionVariables = {
@@ -210,6 +212,11 @@ in
 
         # commonlisp
         vlime
+      ]
+      ++ lib.optionals config.my.nvim.copilot.enable [
+        # setup in nvim/init.lua (no-op when plugins absent)
+        pkgs.vimPlugins.copilot-vim
+        pkgs.vimPlugins.avante-nvim
       ];
   };
 

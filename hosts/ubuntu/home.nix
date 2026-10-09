@@ -19,6 +19,8 @@
   # Kundenkontext: kein Bitwarden-Zugriff
   my.rbw.enable = false;
 
+  my.nvim.copilot.enable = true;
+
   my.tmuxSessionizer.paths = [
     "~/git"
     "~/git/exf"

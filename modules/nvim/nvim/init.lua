@@ -71,6 +71,21 @@ require("dap_ui_widgets").setup()
 require("gitsigns").setup({})
 require("completion").setup()
 
+-- Copilot (only installed when my.nvim.copilot.enable): <Tab> belongs to nvim-cmp
+vim.g.copilot_no_tab_map = true
+vim.keymap.set("i", "<C-j>", function()
+  if vim.fn.exists("*copilot#Accept") == 1 then
+    return vim.fn["copilot#Accept"]("")
+  end
+  return ""
+end, { expr = true, replace_keycodes = false, desc = "Copilot accept" })
+
+-- Avante (agentic chat, uses the Copilot login from :Copilot setup)
+local has_avante, avante = pcall(require, "avante")
+if has_avante then
+  avante.setup({ provider = "copilot" })
+end
+
 -- Neo-tree
 require("neo_tree").setup()
 
