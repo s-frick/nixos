@@ -73,6 +73,10 @@ require("completion").setup()
 
 -- Copilot (only installed when my.nvim.copilot.enable): <Tab> belongs to nvim-cmp
 vim.g.copilot_no_tab_map = true
+-- GitHub Enterprise: export COPILOT_GHE_URL in ~/.zshrc.local
+if vim.env.COPILOT_GHE_URL then
+  vim.g.copilot_auth_provider_url = vim.env.COPILOT_GHE_URL
+end
 vim.keymap.set("i", "<C-j>", function()
   if vim.fn.exists("*copilot#Accept") == 1 then
     return vim.fn["copilot#Accept"]("")

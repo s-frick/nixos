@@ -65,6 +65,9 @@
       ${lib.optionalString config.my.rbw.enable ''bindkey -s ^p "rbw-fzf\n"''}
       bindkey -s ^e "ranger\n"
 
+      # machine-local, unmanaged settings (e.g. COPILOT_GHE_URL)
+      [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
       MODE_PROMPT="%F{red}[N]%f"
 
       function zle-keymap-select {
