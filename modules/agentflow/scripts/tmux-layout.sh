@@ -55,3 +55,8 @@ if [[ -z $first ]]; then
 else
   tmux select-window -t "$first"
 fi
+
+# Show agentflow help once, when a client first enters the new session
+help="run-shell -b \"tmux set-hook -u -t '$session' client-session-changed; tmux set-hook -u -t '$session' client-attached; $(command -v agent-help) --popup '#{client_name}'\""
+tmux set-hook -t "$session" client-session-changed "$help"
+tmux set-hook -t "$session" client-attached "$help"

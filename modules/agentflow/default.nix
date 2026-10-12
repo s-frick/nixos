@@ -18,7 +18,8 @@ let
     };
   mkScript = name: runtimeInputs: mkScript' name runtimeInputs "";
 
-  tmuxLayout = mkScript' "tmux-layout" (with pkgs; [ tmux git coreutils ]) ''
+  agentHelp = mkScript "agent-help" [ pkgs.tmux ];
+  tmuxLayout = mkScript' "tmux-layout" (with pkgs; [ tmux git coreutils agentHelp ]) ''
     AGENTFLOW_DEFAULT_LAYOUT=''${AGENTFLOW_DEFAULT_LAYOUT:-${lib.escapeShellArg cfg.defaultLayout}}
   '';
   sessionizer =
@@ -28,6 +29,7 @@ let
         AGENTFLOW_PATHS=''${AGENTFLOW_PATHS//\~/$HOME}
       '';
   scripts = [
+    agentHelp
     tmuxLayout
     sessionizer
     (mkScript "tk" (with pkgs; [ tmux fzf git coreutils gnused sessionizer ]))
@@ -71,6 +73,7 @@ in
       set -g window-status-current-format " [#I] #W#{?@agent_state, #{@agent_state},} "
       set -g status-right "#[fg=colour214]#(${scriptsDir}/agent-status)#[fg=colour240]%d.%m.%y"
 
+      bind H run-shell -b "${scriptsDir}/agent-help --popup '#{client_name}'"
       bind f display-popup -E -w 80% -h 80% "${scriptsDir}/tmux-sessionizer"
       bind a run-shell "${scriptsDir}/agent-next"
       bind A display-popup -E -w 90% -h 80% "${scriptsDir}/agent-pick"
