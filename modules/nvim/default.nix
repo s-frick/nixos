@@ -214,9 +214,8 @@ in
         vlime
       ]
       ++ lib.optionals config.my.nvim.copilot.enable [
-        # setup in nvim/init.lua (no-op when plugins absent)
+        # keymaps in nvim/init.lua (no-op when plugin absent)
         pkgs.vimPlugins.copilot-vim
-        pkgs.vimPlugins.avante-nvim
       ];
   };
 

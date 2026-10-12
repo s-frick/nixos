@@ -84,12 +84,6 @@ vim.keymap.set("i", "<C-j>", function()
   return ""
 end, { expr = true, replace_keycodes = false, desc = "Copilot accept" })
 
--- Avante (agentic chat, uses the Copilot login from :Copilot setup)
-local has_avante, avante = pcall(require, "avante")
-if has_avante then
-  avante.setup({ provider = "copilot" })
-end
-
 -- Neo-tree
 require("neo_tree").setup()
 
