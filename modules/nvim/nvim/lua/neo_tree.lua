@@ -65,6 +65,8 @@ function M.setup()
 
     filesystem = {
       hijack_netrw_behavior = "disabled", -- netrw bleibt für :Ex erhalten
+      group_empty_dirs = true, -- a/b/c in einer Zeile (Java-Packages)
+      scan_mode = "deep", -- nötig, damit Gruppierung sofort greift
       follow_current_file = {
         enabled = true,
         leave_dirs_open = true,
@@ -86,6 +88,7 @@ function M.setup()
     },
 
     buffers = {
+      group_empty_dirs = true,
       follow_current_file = {
         enabled = true,
         leave_dirs_open = true,
