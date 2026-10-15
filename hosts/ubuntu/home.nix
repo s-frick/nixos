@@ -29,5 +29,9 @@
 
   home.packages = with pkgs; [
     git
+    # dockerd läuft über manuelle /etc/systemd/system/docker.service
+    # (ExecStart=/home/sebi/.nix-profile/bin/dockerd --group docker)
+    docker
+    docker-compose
   ];
 }
