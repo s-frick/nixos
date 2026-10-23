@@ -53,6 +53,14 @@
   desktop.mango.enable = true;
   desktop.mango.enableGreeter = true;
 
+  programs.steam.enable = true;
+  nixpkgs.config.allowUnfreePredicate =
+    pkg:
+    builtins.elem (pkgs.lib.getName pkg) [
+      "steam"
+      "steam-unwrapped"
+    ];
+
   # fuji-spezifische Systempakete
   environment.systemPackages = with pkgs; [
     gimp3
