@@ -5,6 +5,7 @@ return {
     '--clang-tidy',
     '--header-insertion=never',
     -- let clangd ask the cross compiler for its system headers (newlib etc.)
-    '--query-driver=/nix/store/*/bin/arm-none-eabi-*',
+    '--query-driver=/nix/store/*/bin/arm-none-eabi-*,/nix/store/*/bin/g++,/nix/store/*/bin/gcc',
+
   },
 }
