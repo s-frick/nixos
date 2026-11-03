@@ -5,5 +5,6 @@
     "~/git"
     "~/git/arena"
     "~/git/tools"
+    "~/git/probes"
   ];
 }
