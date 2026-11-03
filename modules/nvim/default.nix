@@ -18,6 +18,17 @@ let
     };
     doCheck = false;
   };
+  atlas-nvim = pkgs.vimUtils.buildVimPlugin {
+    pname = "atlas.nvim";
+    version = "feat-gitea-forgejo";
+    src = pkgs.fetchFromGitHub {
+      owner = "emrearmagan";
+      repo = "atlas.nvim";
+      rev = "4b04da8c181c7dc94422d35935fbda292a361a5d"; # branch feat/gitea-forgejo
+      sha256 = "sha256-PzR+9OGknIdV8/Yflmanx+Vj3QR2R8ahNbPSNjdOiOc=";
+    };
+    doCheck = false;
+  };
   mermaid-nvim = pkgs.vimUtils.buildVimPlugin {
     pname = "mermaid.nvim";
     version = "main";
@@ -131,6 +142,7 @@ in
 
     extraPackages = with pkgs; [
       tree-sitter-cli
+      curl # atlas.nvim
     ];
 
     plugins =
@@ -209,6 +221,7 @@ in
       ])
       ++ [
         mermaid-nvim
+        atlas-nvim
 
         # commonlisp
         vlime

@@ -84,6 +84,9 @@ vim.keymap.set("i", "<C-j>", function()
   return ""
 end, { expr = true, replace_keycodes = false, desc = "Copilot accept" })
 
+-- atlas.nvim (Forgejo/Jira): URLs per project via .nvim.lua, see lua/atlas_setup.lua
+require("atlas_setup").setup()
+
 -- Neo-tree
 require("neo_tree").setup()
 
