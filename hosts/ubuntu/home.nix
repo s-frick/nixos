@@ -30,10 +30,12 @@
   '';
 
   # Firmen-Proxy-CA (via update-ca-certificates im System-Bundle) auch für Tools
-  # mit eigenem CA-Store: Node (copilot, npx) und Rust/OpenSSL.
+  # mit eigenem CA-Store: Node (copilot, npx), Rust/OpenSSL, Java (mvn, jdtls).
+  # Java-Truststore wird einmalig erzeugt, siehe README.md "Java-Truststore".
   home.sessionVariables = {
     NODE_EXTRA_CA_CERTS = "/etc/ssl/certs/ca-certificates.crt";
     SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt";
+    JAVA_TOOL_OPTIONS = "-Djavax.net.ssl.trustStore=/home/sebi/.local/share/java/cacerts -Djavax.net.ssl.trustStorePassword=changeit";
   };
 
   my.tmuxSessionizer.paths = [

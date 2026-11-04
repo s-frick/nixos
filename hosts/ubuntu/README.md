@@ -110,6 +110,23 @@ copilot login --host https://barmeniagothaer.ghe.com --device-code
 
 Browser-OAuth-Flow (Redirect auf `127.0.0.1`) liefert HTTP 400 → Device-Code nutzen.
 
+## 10. Java-Truststore (Maven, jdtls)
+
+Java liest kein PEM-Bundle, braucht eigenen Truststore. `JAVA_TOOL_OPTIONS`
+in `home.nix` zeigt darauf. Erzeugen (und neu erzeugen, wenn sich die CA ändert):
+
+```sh
+d=$(mktemp -d) && csplit -sz -f "$d/c-" /etc/ssl/certs/ca-certificates.crt '/-----BEGIN CERTIFICATE-----/' '{*}'
+mkdir -p ~/.local/share/java && rm -f ~/.local/share/java/cacerts
+for f in "$d"/c-*; do
+  keytool -importcert -noprompt -storetype PKCS12 -keystore ~/.local/share/java/cacerts \
+    -storepass changeit -alias "$(basename "$f")" -file "$f" >/dev/null
+done
+keytool -list -keystore ~/.local/share/java/cacerts -storepass changeit | grep -c trustedCertEntry
+```
+
+`keytool` kommt aus dem JDK (Projekt-Devshell oder `nix shell nixpkgs#jdk`).
+
 ## Stolperfallen
 
 | Symptom | Ursache | Fix (in `home.nix`) |
@@ -117,6 +134,7 @@ Browser-OAuth-Flow (Redirect auf `127.0.0.1`) liefert HTTP 400 → Device-Code n
 | `copilot login`: `error sending request for url` | Node/Rust nutzen eigenen CA-Store | `NODE_EXTRA_CA_CERTS`, `SSL_CERT_FILE` in `home.sessionVariables` |
 | `docker run`: `docker-credential-secretservice … libsecret-1.so.0` | Rancher Desktop (Windows) via WSL-Interop im PATH; Docker-CLI nutzt den Helper automatisch | Rancher-Pfade in zsh aus `path` filtern |
 | `git clone`: `cannot run ssh` | kein openssh | `openssh` in `home.packages` |
+| Maven: `PKIX path building failed` | Java nutzt eigenen Truststore | Truststore erzeugen (Schritt 10), `JAVA_TOOL_OPTIONS` |
 
 ## Diagnose: was sieht die Sandbox?
 
