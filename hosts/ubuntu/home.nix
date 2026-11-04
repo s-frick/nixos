@@ -22,6 +22,13 @@
   my.nvim.copilot.enable = true;
   my.graft.enable = true;
 
+  # Rancher Desktop (Windows, nicht deinstallierbar) liegt via WSL-Interop im PATH;
+  # sein docker-credential-secretservice wird sonst vom Docker-CLI automatisch genutzt
+  # und scheitert an fehlendem libsecret.
+  programs.zsh.initContent = ''
+    path=(''${path:#*/Rancher Desktop/*})
+  '';
+
   my.tmuxSessionizer.paths = [
     "~/git"
     "~/git/exf"
