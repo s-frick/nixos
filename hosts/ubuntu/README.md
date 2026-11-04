@@ -100,6 +100,24 @@ sudo systemctl daemon-reload && sudo systemctl enable --now docker
 
 Neu einloggen (Gruppe), dann `docker run --rm hello-world`.
 
+## 9. GitHub (GHE.com) + Copilot CLI
+
+```sh
+ssh-keygen -t ed25519 -C "sebi@VDI02"
+gh auth login --hostname barmeniagothaer.ghe.com      # Device-Code, URL manuell öffnen
+copilot login --host https://barmeniagothaer.ghe.com --device-code
+```
+
+Browser-OAuth-Flow (Redirect auf `127.0.0.1`) liefert HTTP 400 → Device-Code nutzen.
+
+## Stolperfallen
+
+| Symptom | Ursache | Fix (in `home.nix`) |
+|---|---|---|
+| `copilot login`: `error sending request for url` | Node/Rust nutzen eigenen CA-Store | `NODE_EXTRA_CA_CERTS`, `SSL_CERT_FILE` in `home.sessionVariables` |
+| `docker run`: `docker-credential-secretservice … libsecret-1.so.0` | Rancher Desktop (Windows) via WSL-Interop im PATH; Docker-CLI nutzt den Helper automatisch | Rancher-Pfade in zsh aus `path` filtern |
+| `git clone`: `cannot run ssh` | kein openssh | `openssh` in `home.packages` |
+
 ## Diagnose: was sieht die Sandbox?
 
 ```sh

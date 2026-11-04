@@ -29,6 +29,13 @@
     path=(''${path:#*/Rancher Desktop/*})
   '';
 
+  # Firmen-Proxy-CA (via update-ca-certificates im System-Bundle) auch für Tools
+  # mit eigenem CA-Store: Node (copilot, npx) und Rust/OpenSSL.
+  home.sessionVariables = {
+    NODE_EXTRA_CA_CERTS = "/etc/ssl/certs/ca-certificates.crt";
+    SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt";
+  };
+
   my.tmuxSessionizer.paths = [
     "~/git"
     "~/git/exf"
@@ -37,6 +44,7 @@
   home.packages = with pkgs; [
     git
     openssh
+    gh
     # dockerd läuft über manuelle /etc/systemd/system/docker.service
     # (ExecStart=/home/sebi/.nix-profile/bin/dockerd --group docker)
     docker
