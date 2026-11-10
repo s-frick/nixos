@@ -2,7 +2,8 @@ name: update-flake-lock
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 3 * * 5" # freitags 03:00 UTC
+    - cron: "0 3 * * 5" # freitags 03:00 UTC: Lock-PR
+    - cron: "0 6 * * *" # täglich: nur 26.11-Check
 permissions:
   contents: write
   pull-requests: write
@@ -10,9 +11,20 @@ jobs:
   lock:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/update-flake-lock@main
+      # Sobald 26.11 existiert: rot werden (GitHub mailt) statt weiter unstable-PRs zu öffnen.
+      # Dann feat/stable-automerge scharfschalten, das ersetzt diese Datei.
+      - name: Check for nixos-26.11
+        run: |
+          if git ls-remote --exit-code https://github.com/NixOS/nixpkgs refs/heads/nixos-26.11; then
+            echo "::error::nixos-26.11 existiert – feat/stable-automerge scharfschalten, keine unstable-PRs mehr mergen."
+            exit 1
+          fi
+      - if: github.event.schedule != '0 6 * * *'
+        uses: actions/checkout@v4
+      - if: github.event.schedule != '0 6 * * *'
+        uses: DeterminateSystems/nix-installer-action@main
+      - if: github.event.schedule != '0 6 * * *'
+        uses: DeterminateSystems/update-flake-lock@main
         with:
           pr-title: "chore: update flake.lock"
           pr-labels: dependencies
