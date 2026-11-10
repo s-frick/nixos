@@ -2,12 +2,12 @@
   description = "Multi-host NixOS + Home-Manager (one user)";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.11";
 
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-26.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
