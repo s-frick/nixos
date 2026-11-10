@@ -51,6 +51,7 @@
         modules = extra ++ [
           ./hosts/${name}/configuration.nix
           ./modules/common
+          { system.autoUpgrade.flake = "github:s-frick/nixos#${name}"; }
         ];
       };
     in
