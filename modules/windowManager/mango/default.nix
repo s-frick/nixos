@@ -98,7 +98,7 @@ in
 
       wget
       kitty
-      brave
+      inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
 
       # Audio/video
       pavucontrol
@@ -267,7 +267,7 @@ in
   
                     # menu and terminal
                     bind=SUPER,Return,spawn,kitty
-                    bind=SUPER+SHIFT,f,spawn,brave --ozone-platform-hint=auto --enable-features=WebRTCPipeWireCapturer
+                    bind=SUPER+SHIFT,f,spawn,zen-beta
                     bind=SUPER,d,spawn,dms ipc call spotlight open
                     bind=SUPER+SHIFT,s,spawn,mango-screenshot-region
   

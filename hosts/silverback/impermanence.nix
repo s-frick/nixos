@@ -111,7 +111,10 @@
         ".local/state/nvim" # Neovim session state
 
         # ── Desktop / Apps ──
-        ".config/BraveSoftware" # Brave browser profile
+        ".config/BraveSoftware" # Brave browser profile (bleibt für Import nach Zen)
+        # ponytail: Zen-Profilpfad je nach Version ~/.zen oder XDG ~/.config/zen; beide persistiert, ungenutzten später raus
+        ".zen" # Zen browser profile
+        ".config/zen" # Zen browser profile (XDG)
         ".config/DankMaterialShell" # DMS config
         ".local/state/DankMaterialShell" # DMS state
         ".config/lazygit" # Lazygit config

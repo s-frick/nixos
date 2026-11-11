@@ -12,7 +12,8 @@
     };
 
     mangowc = {
-      url = "github:DreamMaoMao/mangowc";
+      # ponytail: gepinnt, neuere Revs haben die Config-Syntax umbenannt (tagrule, gappih, …). Pin raus nach Config-Migration.
+      url = "github:DreamMaoMao/mangowc/fa9a08779896ca67bded9a12ca585c8517e78af4";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -25,6 +26,12 @@
     dank-greeter = {
       url = "github:AvengeMedia/dank-greeter";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
 
     forgejo-mcp-src = {
