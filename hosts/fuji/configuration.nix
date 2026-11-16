@@ -1,5 +1,10 @@
 { pkgs, ... }:
 {
+  imports = [
+    ./sops.nix
+    ../../modules/restic.nix
+  ];
+  services.restic.backups.storagebox.paths = [ "/home/sebi" ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
   desktop.mango.enable = true;
 

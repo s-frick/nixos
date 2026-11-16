@@ -4,7 +4,9 @@
     ../../modules/oom
     ./impermanence.nix
     ./sops.nix
+    ../../modules/restic.nix
   ];
+  services.restic.backups.storagebox.paths = [ "/persist/home/sebi" ];
   nix.settings.secret-key-files = [ "/home/sebi/.config/nix/signing-key.sec" ];
   nix.settings.trusted-users = [
     "root"
