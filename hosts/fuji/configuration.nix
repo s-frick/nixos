@@ -16,6 +16,17 @@
   networking.hostName = "fuji";
   networking.networkmanager.enable = true;
 
+  # Fernzugriff nur per Key, kein root-Login (openFirewall oeffnet Port 22)
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "no";
+    };
+  };
+  users.users.sebi.openssh.authorizedKeys.keyFiles = [ ../../ssh/sebi.pub ];
+
   programs.steam.enable = true;
   nixpkgs.config.allowUnfreePredicate =
     pkg: builtins.elem (pkgs.lib.getName pkg) [ "steam" "steam-unwrapped" ];
