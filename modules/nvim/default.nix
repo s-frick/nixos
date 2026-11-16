@@ -232,5 +232,8 @@ in
       ];
   };
 
-  xdg.configFile."nvim".source = ./nvim;
+  xdg.configFile."nvim" = {
+    source = ./nvim;
+    recursive = true; # real dir so DMS/matugen can write colors/dms.lua
+  };
 }
