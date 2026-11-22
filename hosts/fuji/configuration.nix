@@ -26,10 +26,18 @@
     };
   };
   users.users.sebi.openssh.authorizedKeys.keyFiles = [ ../../ssh/sebi.pub ];
+  networking.wg-quick.interfaces.wg0 = {
+    configFile = "/etc/wireguard/wg0.conf";
+    autostart = false;
+  };
 
   programs.steam.enable = true;
   nixpkgs.config.allowUnfreePredicate =
-    pkg: builtins.elem (pkgs.lib.getName pkg) [ "steam" "steam-unwrapped" ];
+    pkg:
+    builtins.elem (pkgs.lib.getName pkg) [
+      "steam"
+      "steam-unwrapped"
+    ];
 
   # fuji-spezifische Systempakete
   environment.systemPackages = with pkgs; [
