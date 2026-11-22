@@ -48,6 +48,17 @@
   users.groups.plugdev = { };
   users.users.sebi.extraGroups = [ "plugdev" ];
 
+  # Fernzugriff nur per Key, kein root-Login (openFirewall oeffnet Port 22)
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "no";
+    };
+  };
+  users.users.sebi.openssh.authorizedKeys.keyFiles = [ ../../ssh/sebi.pub ];
+
   # NixOS-spezifisch für silverback
   networking.hostName = "silverback";
   networking.networkmanager.enable = true;
