@@ -1,30 +1,28 @@
 name: update-flake-lock
+# Wöchentlich: Lock bumpen, alle Hosts bauen, bei grünem Build direkt auf main pushen.
+# Kein PR → kein PAT nötig (GITHUB_TOKEN-PRs triggern keine CI). Roter Build = kein Push.
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 3 * * 5" # freitags 03:00 UTC: Lock-PR
-    - cron: "0 6 * * *" # täglich: nur 26.11-Check
+    - cron: "0 3 * * 5" # freitags 03:00 UTC
 permissions:
   contents: write
-  pull-requests: write
 jobs:
-  lock:
+  update:
     runs-on: ubuntu-latest
     steps:
-      # Sobald 26.11 existiert: rot werden (GitHub mailt) statt weiter unstable-PRs zu öffnen.
-      # Dann feat/stable-automerge scharfschalten, das ersetzt diese Datei.
-      - name: Check for nixos-26.11
-        run: |
-          if git ls-remote --exit-code https://github.com/NixOS/nixpkgs refs/heads/nixos-26.11; then
-            echo "::error::nixos-26.11 existiert – feat/stable-automerge scharfschalten, keine unstable-PRs mehr mergen."
-            exit 1
-          fi
-      - if: github.event.schedule != '0 6 * * *'
-        uses: actions/checkout@v4
-      - if: github.event.schedule != '0 6 * * *'
-        uses: DeterminateSystems/nix-installer-action@main
-      - if: github.event.schedule != '0 6 * * *'
-        uses: DeterminateSystems/update-flake-lock@main
+      - uses: jlumbroso/free-disk-space@main
         with:
-          pr-title: "chore: update flake.lock"
-          pr-labels: dependencies
+          tool-cache: true
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Update flake.lock
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          nix flake update --commit-lock-file
+      - name: Build all hosts
+        run: nix build .#buildAll -L
+      - name: Push
+        run: git push origin HEAD:main
